@@ -1,8 +1,8 @@
 <?php
 
-/* 
- * HTTP通信协议简单实现
- */
+/* Version 0.9, 6th April 2003 - Simon Willison ( http://simon.incutio.com/ )
+   Manual: http://scripts.incutio.com/httpclient/
+*/
 
 class HttpClient {
     // Request vars
@@ -13,17 +13,10 @@ class HttpClient {
     var $postdata = '';
     var $cookies = array();
     var $referer;
-	var $force_referer;
-	var $location;
-	
-	var $connection = "keep-alive";
-	var $cacheControl = "max-age=0";
-	var $charset = "GBK,utf-8;q=0.7,*;q=0.3";
-	
     var $accept = 'text/xml,application/xml,application/xhtml+xml,text/html,text/plain,image/png,image/jpeg,image/gif,*/*';
-    var $accept_encoding = 'gzip,deflate,sdch';
-    var $accept_language = 'en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4';
-    var $user_agent = 'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4';
+    var $accept_encoding = 'gzip';
+    var $accept_language = 'en-us';
+    var $user_agent = 'Incutio HttpClient v0.9';
     // Options
     var $timeout = 20;
     var $use_gzip = true;
@@ -51,7 +44,6 @@ class HttpClient {
         $this->port = $port;
     }
     function get($path, $data = false) {
-		
         $this->path = $path;
         $this->method = 'GET';
         if ($data) {
@@ -116,7 +108,6 @@ class HttpClient {
     	// Now start reading back the response
     	while (!feof($fp)) {
     	    $line = fgets($fp, 4096);
-			//echo "****$line\n";
     	    if ($atStart) {
     	        // Deal with first line of returned data
     	        $atStart = false;
@@ -131,9 +122,7 @@ class HttpClient {
     	        $this->debug(trim($line));
     	        continue;
     	    }
-			
     	    if ($inHeaders) {
-				//echo "$line\n";
     	        if (trim($line) == '') {
     	            $inHeaders = false;
     	            $this->debug('Received Headers', $this->headers);
@@ -142,15 +131,12 @@ class HttpClient {
     	            }
     	            continue;
     	        }
-				//echo "$line\n";
     	        if (!preg_match('/([^:]+):\\s*(.*)/', $line, $m)) {
     	            // Skip to the next header
-					//echo "skip $line\n";
     	            continue;
     	        }
     	        $key = strtolower(trim($m[1]));
     	        $val = trim($m[2]);
-				//echo "$key  ->  $val\n";
     	        // Deal with the possibility of multiple headers of same name
     	        if (isset($this->headers[$key])) {
     	            if (is_array($this->headers[$key])) {
@@ -174,26 +160,18 @@ class HttpClient {
             $this->content = gzinflate($this->content);
         }
         // If $persist_cookies, deal with any cookies
-		//echo "$this->host , $this->cookie_host\n";
-        //$s = ($this->host == $this->cookie_host);
-		//echo "$s\n";
-		
-        if ($this->persist_cookies && isset($this->headers['set-cookie']) /*&& $this->host == $this->cookie_host*/) {
-			
+        if ($this->persist_cookies && isset($this->headers['set-cookie']) && $this->host == $this->cookie_host) {
             $cookies = $this->headers['set-cookie'];
             if (!is_array($cookies)) {
                 $cookies = array($cookies);
             }
             foreach ($cookies as $cookie) {
-			    //echo $cookie."\n";
                 if (preg_match('/([^=]+)=([^;]+);/', $cookie, $m)) {
                     $this->cookies[$m[1]] = $m[2];
-					//echo "{$m[1]} : {$m[2]}\n";
                 }
             }
             // Record domain of cookies for security reasons
             $this->cookie_host = $this->host;
-
         }
         // If $persist_referers, set the referer ready for the next request
         if ($this->persist_referers) {
@@ -208,34 +186,22 @@ class HttpClient {
                 $this->redirect_count = 0;
                 return false;
             }
-			
             $location = isset($this->headers['location']) ? $this->headers['location'] : '';
             $uri = isset($this->headers['uri']) ? $this->headers['uri'] : '';
             if ($location || $uri) {
-
-                //$url = parse_url($location . $uri);
+                $url = parse_url($location.$uri);
                 // This will FAIL if redirect is to a different site
-                //return $this->get($url['path']);
-				$this->location = $location;
-				return $location;
+                return $this->get($url['path']);
             }
         }
         return true;
     }
     function buildRequest() {
         $headers = array();
-		//$path = urlencode($this->path);
-		
-		$path = $this->path;
-		$this->debug("Path\n**$path");
-        $headers[] = "{$this->method} {$path} HTTP/1.0"; // Using 1.1 leads to all manner of problems, such as "chunked" encoding
+        $headers[] = "{$this->method} {$this->path} HTTP/1.0"; // Using 1.1 leads to all manner of problems, such as "chunked" encoding
         $headers[] = "Host: {$this->host}";
         $headers[] = "User-Agent: {$this->user_agent}";
         $headers[] = "Accept: {$this->accept}";
-		$headers[] = "Accept-Charset: {$this->charset}";
-		$headers[] = "Connection: {$this->connection}";
-		$headers[] = "Cache-Control: {$this->cacheControl}";
-		
         if ($this->use_gzip) {
             $headers[] = "Accept-encoding: {$this->accept_encoding}";
         }
@@ -243,9 +209,6 @@ class HttpClient {
         if ($this->referer) {
             $headers[] = "Referer: {$this->referer}";
         }
-
-        
-        
     	// Cookies
     	if ($this->cookies) {
     	    $cookie = 'Cookie: ';
@@ -262,9 +225,6 @@ class HttpClient {
     	if ($this->postdata) {
     	    $headers[] = 'Content-Type: application/x-www-form-urlencoded';
     	    $headers[] = 'Content-Length: '.strlen($this->postdata);
-    	    //$headers[] = "RA-Sid:3AD398F2-20140813-024739-113122-a9fda7";
-        	//$headers[] = "RA-Ver:2.7.0";
-        	//$headers[] = "Origin: http://epub.cnki.net";
     	}
     	$request = implode("\r\n", $headers)."\r\n\r\n".$this->postdata;
     	return $request;
@@ -293,22 +253,12 @@ class HttpClient {
         return $this->cookies;
     }
     function getRequestURL() {
-	
         $url = 'http://'.$this->host;
         if ($this->port != 80) {
             $url .= ':'.$this->port;
         }            
-        
-		if(strpos(" ".$this->path,"http://")==false)
-		{
-			$url .= $this->path;
-			return $url;
-		}
-        else 
-		{
-			return $this->path;
-		}
-
+        $url .= $this->path;
+        return $url;
     }
     // Setter methods
     function setUserAgent($string) {
@@ -372,36 +322,18 @@ class HttpClient {
         }
     }
     function debug($msg, $object = false) {
-		
         if ($this->debug) {
-			print "\n\n======================START===============================\n\n";
-            //print '<div style="border: 1px solid red; padding: 0.5em; margin: 0.5em;"><strong>HttpClient Debug:</strong> '.$msg;
-			print_r($msg);
-			print "\n";
+            print '<div style="border: 1px solid red; padding: 0.5em; margin: 0.5em;"><strong>HttpClient Debug:</strong> '.$msg;
             if ($object) {
                 ob_start();
         	    print_r($object);
-				print "\n";
-        	    //$content = htmlentities(ob_get_contents());
-				$content = ob_get_contents();
+        	    $content = htmlentities(ob_get_contents());
         	    ob_end_clean();
-        	    print $content;
-				print "\n";
+        	    print '<pre>'.$content.'</pre>';
         	}
-        	print "\n\n=================END====================================\n\n";
+        	print '</div>';
         }
-    }
-	
-	function setReferer($refUrl)
-	{
-		$this->force_referer = $refUrl;
-	}
-	
-	function getLocation()
-	{
-		return $this->location;
-	}
-		
+    }   
 }
 
 ?>

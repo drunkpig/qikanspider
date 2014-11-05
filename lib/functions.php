@@ -2,9 +2,11 @@
 require_once "simple_html_dom.php";
 require_once "HttpClient.class.php";
 
+	$client = new HttpClient('epub.cnki.net');
+	$client->debug = true;
+
 function parse_img_url($content)
 {
-	
 	$pattern = "/<img width=206 src='\/fengmian\/(.*?)'/";
 	$match = array();
 	preg_match($pattern, $content, $match);
@@ -28,7 +30,6 @@ function get_image_small($img)
 	$smallUrl = "http://c61.cnki.net/CJFD/small/" . $img;
 	$content = file_get_contents($smallUrl);
 	file_put_contents($img_small_dir . $img, $content);
-	
 }
 
 /**
@@ -76,25 +77,31 @@ function get_cache_file_name($url)
 function file_get($url)
 {
 	$fname = get_cache_file_name($url);
-	if(file_exists($fname))
-	{
-		//echo "cache hit!\n";
-		return file_get_contents($fname);
-	}
-	else
-	{
-		//echo "cache miss!\n";
-		$c = file_get_contents($url);
-		file_put_contents($fname, $c);
-		return $c;
-	}
+	//if(file_exists($fname))
+	//{
+	//	//echo "cache hit!\n";
+	//	return file_get_contents($fname);
+	//}
+	//else
+	//{
+	//	//echo "cache miss!\n";
+	//	$c = file_get_contents($url);
+	//	file_put_contents($fname, $c);
+	//	return $c;
+	//}
+	
+	global $client;
+	$client->get($url);
+	$content = $client->getContent();
+	file_put_contents($fname, $content);
+	return $content;
 }
 
 function parse_page_count($content)
 {
 	$dom = new simple_html_dom();
 	$html = $dom->load($content);
-	$page = $html->find("span#lblCount");
+	$page = $html->find("span#lblPageCount");
 	$page = $page[0]->plaintext;
 	$dom->clear();
 	return $page;
@@ -153,9 +160,9 @@ function parse_post_data($i, $content)
 	$data["hidType"] = "CJFQ";
 	$data["drpField"] = 'cykm$%"{0}"';
 	$data["txtValue"] = "";
-	$data["DisplayModeRadio"] = "图形方式";
+	//$data["DisplayModeRadio"] = "图形方式";
 	$data["drpAttach"] = "order by idno";
-	$data["DisplayModeRadio11"] = "图形方式";
+	//$data["DisplayModeRadio11"] = "图形方式";
 	$data["drpAttach"] = "order by idno";
 	return $data;
 }
@@ -173,7 +180,8 @@ function fsave($name, $content)
 
 function parse_ot_page($pageCount, $firstPageContent, $startUrl)
 {
-	$client = new HttpClient('epub.cnki.net');
+	$startUrl = "http://epub.cnki.net/kns/oldnavi/n_list.aspx?NaviID=116&Field=168%E4%B8%93%E9%A2%98%E4%BB%A3%E7%A0%81&Value=A000%3f&OrderBy=idno&NaviLink=%E5%9F%BA%E7%A1%80%E7%A7%91%E5%AD%A6%E7%BB%BC%E5%90%88";
+	global $client;
 	$client->get($startUrl);//目的是为了获取cookie和ref头
 
 	$result = array();
@@ -188,8 +196,11 @@ function parse_ot_page($pageCount, $firstPageContent, $startUrl)
 		else
 		{
 			$postData = parse_post_data($i, $pageContent);
+			//var_dump($postData);exit;
 			//填充post的参数
-			$pageContent = $client->post($startUrl, $postData);
+			$client->post($startUrl, $postData);
+			$pageContent = $client->getContent();
+			//var_dump($pageContent);exit;
 			if(!fsave($fname, $pageContent))
 			{
 				echo "Empty Content\n";
@@ -214,6 +225,7 @@ function get_a_class_of_qikan($startUrl)
 	$content = file_get($startUrl);
 	//1,找出来有多少页
 	$pageCount = parse_page_count($content);
+
 	//2,获取页面上具体的杂志地址
 	$nameUrl = parse_paged_url($content);
 	//3,循环获取其他分页中的
@@ -225,4 +237,5 @@ function get_a_class_of_qikan($startUrl)
 	$nameUrl = array_merge($nameUrl, $ot);
 	return $nameUrl;
 }
+
 ?>
