@@ -2,8 +2,7 @@
 require_once "simple_html_dom.php";
 require_once "HttpClient.class.php";
 
-	$client = new HttpClient('epub.cnki.net');
-	$client->debug = true;
+$client = new HttpClient('epub.cnki.net');
 
 function parse_img_url($content)
 {
@@ -79,7 +78,7 @@ function file_get($url)
 	$fname = get_cache_file_name($url);
 	//if(file_exists($fname))
 	//{
-	//	//echo "cache hit!\n";
+	//	echo "cache hit!\n";
 	//	return file_get_contents($fname);
 	//}
 	//else
@@ -93,7 +92,12 @@ function file_get($url)
 	global $client;
 	$client->get($url);
 	$content = $client->getContent();
-	file_put_contents($fname, $content);
+	if(strlen($content)>100)
+	{
+		file_put_contents($fname, $content);
+	}
+	
+	//sleep(2);
 	return $content;
 }
 
@@ -169,6 +173,7 @@ function parse_post_data($i, $content)
 
 function fsave($name, $content)
 {
+	$content = trim($content);
 	if(strlen($content)<500)
 	{
 		echo "Empty page\n";
@@ -180,7 +185,6 @@ function fsave($name, $content)
 
 function parse_ot_page($pageCount, $firstPageContent, $startUrl)
 {
-	$startUrl = "http://epub.cnki.net/kns/oldnavi/n_list.aspx?NaviID=116&Field=168%E4%B8%93%E9%A2%98%E4%BB%A3%E7%A0%81&Value=A000%3f&OrderBy=idno&NaviLink=%E5%9F%BA%E7%A1%80%E7%A7%91%E5%AD%A6%E7%BB%BC%E5%90%88";
 	global $client;
 	$client->get($startUrl);//目的是为了获取cookie和ref头
 
@@ -189,12 +193,13 @@ function parse_ot_page($pageCount, $firstPageContent, $startUrl)
 	for($i=1; $i<$pageCount; $i++)//从第二页开始到$pageCount页
 	{
 		$fname = get_cache_file_name($startUrl.$i);
-		if(file_exists($fname))
-		{
-			$pageContent = file_get($fname);
-		}
-		else
-		{
+		//if(file_exists($fname))
+		//{
+		//	$pageContent = file_get_contents($fname);
+		//	echo "...........Cached\n";
+		//}
+		//else
+		//{
 			$postData = parse_post_data($i, $pageContent);
 			//var_dump($postData);exit;
 			//填充post的参数
@@ -206,15 +211,28 @@ function parse_ot_page($pageCount, $firstPageContent, $startUrl)
 				echo "Empty Content\n";
 				continue;
 			}
-		}
-
+			else
+			{
+				echo "POST　GET.....\n";
+			}
+			sleep(2);
+		//}
+		$cur = $i+1;
+		echo "$cur / $pageCount / $fname\n";
 		//解析页面内容
 		echo "解析。。。。\n";
 		$o = parse_paged_url($pageContent);
 		$result = array_merge($result, $o);
+		
 	}
-	
+	//echo "========================================\n";
 	return $result;
+}
+
+function resetClient()
+{
+	global $client;
+	$client = new HttpClient('epub.cnki.net');
 }
 
 /**
@@ -222,10 +240,12 @@ function parse_ot_page($pageCount, $firstPageContent, $startUrl)
  */
 function get_a_class_of_qikan($startUrl)
 {
+	resetClient();
+	//echo "StartUrl : $startUrl\n";
 	$content = file_get($startUrl);
 	//1,找出来有多少页
 	$pageCount = parse_page_count($content);
-
+	echo "Get Page Count of $pageCount\n";
 	//2,获取页面上具体的杂志地址
 	$nameUrl = parse_paged_url($content);
 	//3,循环获取其他分页中的
