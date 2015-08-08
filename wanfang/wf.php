@@ -14,7 +14,9 @@ function file_get1($filePath)
 	else
 	{
 		$content = file_get_contents($filePath);
-		file_put_contents($fname, $content);
+		if(strlen($content)>100){
+			file_put_contents($fname, $content);
+		}
 		return $content;
 	}
 }
@@ -25,6 +27,82 @@ function saveResult($line)
 	fwrite($fp, $line);
 	fclose($fp);
 	echo "SAVE ............. $line";
+}
+function saveCore($arr, $u){
+	$fp = fopen("./core.log", "a+");
+	foreach($arr as $key){
+		echo "$key\t$u\n";
+		fwrite($fp, "$key\n");
+	}
+	var_dump($arr);
+	fclose($fp);
+}
+function savePrePub($arr, $u){
+	$fp = fopen("./prePub.log", "a+");
+	foreach($arr as $key){
+		echo "$key\t$u\n";
+		fwrite($fp, "$key\n");
+	}
+	var_dump($arr);
+	fclose($fp);
+}
+
+function rendCoreUrl($url){
+	
+	$code = substr($url, strpos($url, "=")+1);
+	$url = "http://c.wanfangdata.com.cn/PeriodicalSubject.aspx?NodeId=$code&IsCore=true";
+	return $url;
+}
+
+function rendPrePubUrl($url){
+	$code = substr($url, strpos($url, "=")+1);
+	$url = "http://c.wanfangdata.com.cn/PeriodicalSubject.aspx?NodeId=$code&IsPrePublished=true";
+	return $url;
+}
+
+function parseOtherAttribute(&$indexArray){
+	$newArray = array();
+	foreach($indexArray as $class=>$url){
+		$newClass = $class;
+		echo "1\n";
+		$content = file_get1(rendCoreUrl($url));
+		$dom = new simple_html_dom();
+		$html = $dom->load($content);
+		//找到期刊名字数组
+		$core = array();
+		$docs = $html->find("ul.record_items li");
+		foreach($docs as $qikan)
+		{
+			$a = $qikan->find("a");
+			if(count($a)==2){
+				$a = $a[1];
+				$name = trim($a->plaintext);
+				$core[] = $name;
+			}
+		}
+		saveCore($core, rendCoreUrl($url));
+		$dom->clear();
+		echo "2\n";
+		$content = file_get1(rendPrePubUrl($url));
+		$dom = new simple_html_dom();
+		$html = $dom->load($content);
+		//找到优先出版刊物名称数组2
+		$prePub = array();
+		$docs = $html->find("ul.record_items li");
+		foreach($docs as $qikan)
+		{
+			$a = $qikan->find("a");
+			if(count($a)>=2){
+				$a = $a[1];
+				$name = trim($a->plaintext);
+				$prePub[] = $name;
+			}
+			
+		}
+		$dom->clear();
+		savePrePub($prePub, rendPrePubUrl($url));
+	}
+
 }
 
 function process($class, $content)
@@ -81,10 +159,12 @@ function process($class, $content)
 	//根据索引来抓取
 	
 	//var_dump($indexArray);
+	parseOtherAttribute($indexArray);//添加是否核心，是否优先出版的属性
 	$qikanPageMap = array();
 	foreach($indexArray as $class=>$url)
 	{
 		//1,得到页面
+		echo "3\n";
 		$content = file_get1($url);
 		$dom = new simple_html_dom();
 		$html = $dom->load($content);
@@ -103,6 +183,7 @@ function process($class, $content)
 			{
 				echo "解析第".  $i . "页\n";
 				$u = $url . "&PageNo=$i";
+				echo "4\n";
 				$content = file_get1($u);
 				process($class, $content);
 			}

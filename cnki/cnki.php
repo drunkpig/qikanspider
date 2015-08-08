@@ -1,5 +1,5 @@
 <?php 
-require_once "./lib/functions.php";
+require_once "../lib/functions.php";
 
 $portal = array(
                 "自然科学与工程技术" => "http://epub.cnki.net/kns/oldnavi/n_Navi.aspx?NaviID=116&Flg=", 
