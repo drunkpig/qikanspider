@@ -7,8 +7,10 @@ function file_get1($filePath)
 {
 	$fname = md5($filePath).".html";
 	$fname = "./cache/$fname";
+	echo "$fname get ";
 	if(file_exists($fname))
 	{
+		echo " from cache.\n";
 		return file_get_contents($fname);
 	}
 	else
@@ -16,8 +18,10 @@ function file_get1($filePath)
 		$content = file_get_contents($filePath);
 		if(strlen($content)>100){
 			file_put_contents($fname, $content);
+			echo " from net.\n";
 			sleep(2000);
 		}
+		else echo " from net but too small.\n";
 		return $content;
 	}
 }
