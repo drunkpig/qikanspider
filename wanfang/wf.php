@@ -230,10 +230,10 @@ function parseDetail($class, $url, $content){
 
 <?php
 
-	$url = "http://c.wanfangdata.com.cn/PeriodicalProfile-jcfy.aspx";
-	$content = file_get1($url);
-	parseDetail("thisis-class", $url, $content);
-	exit;
+	// $url = "http://c.wanfangdata.com.cn/PeriodicalProfile-jcfy.aspx";
+	// $content = file_get1($url);
+	// parseDetail("thisis-class", $url, $content);
+	// exit;
 	$potral = "http://c.wanfangdata.com.cn/Periodical.aspx";
 	$content = file_get_contents($potral);
 	fsave("./cache/index.html", $content);
