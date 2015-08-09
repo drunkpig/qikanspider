@@ -20,7 +20,7 @@ function file_get1($filePath)
 		if(strlen($content)>100){
 			file_put_contents($fname, $content);
 			echo " from net.\n";
-			sleep(2000);
+			sleep(1);
 		}
 		else echo " from net but too small.\n";
 		return $content;
@@ -153,11 +153,13 @@ function parseDetail($class, $url, $content){
 	$imgFile = $imageCache . md5($imgUrl).".jpg";
 	file_put_contents($imgFile, $imgContent);
 	$result['image_little'] = $imgFile;
+	echo "[1]封面->";
 	//2,中文名称
 	$node = $dom->find("div.qkhead_list_qk h1");
 	$node = $node[0];
 	$bookName = $node->plaintext;
 	$result['book_name_zh'] = trim($bookName);
+	echo "[2]中文名->";
 	//3,英文名称
 	$node = $dom->find("p#qkhead_en");
 	if(count($node)>0){
@@ -165,7 +167,7 @@ function parseDetail($class, $url, $content){
 		$bookName = $node->plaintext;
 		$result['book_name_en'] = trim($bookName);
 	}
-	
+	echo "[3]英文名->";
 	//4,期刊简介
 	$node = $dom->find("p.qikan_info");
 	if(count($node)>0){
@@ -173,6 +175,7 @@ function parseDetail($class, $url, $content){
 		$jianjie = $node->plaintext;
 		$result['qikan_jianjie'] = trim($jianjie);
 	}
+	echo "[4]期刊简介->";
 	//5,主要栏目
 	$node = $dom->find("div.qikan_lm");
 	if(count($node)>0){
@@ -188,6 +191,7 @@ function parseDetail($class, $url, $content){
 		}
 		$result['qikan_lanmu'] = $lanmu;
 	}
+	echo "[5]主要栏目->";
 	//6,期刊信息
 	$node = $dom->find("div.qikan_lm");
 	if(count($node)>=2){
@@ -213,7 +217,7 @@ function parseDetail($class, $url, $content){
 		$result['qikan_info'] = $info;
 	}
 	}
-	
+	echo "[6]详细信息->";
 	//7,获奖情况
 	$node = $dom->find("div.qikan_lm");
 	if(count($node)>2){
@@ -226,7 +230,7 @@ function parseDetail($class, $url, $content){
 		
 		$result['huo_jiang'] = $info;
 	}
-	
+	echo "[7]获奖情况\n";
 	file_put_contents($detailLog, my_json_encode($result) . "\n", FILE_APPEND);
 	
 	$dom->clear();
