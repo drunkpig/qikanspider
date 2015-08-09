@@ -16,6 +16,7 @@ function file_get1($filePath)
 		$content = file_get_contents($filePath);
 		if(strlen($content)>100){
 			file_put_contents($fname, $content);
+			sleep(2000);
 		}
 		return $content;
 	}
@@ -128,6 +129,7 @@ function process($class, $content)
 }
 
 function parseDetail($class, $url, $content){
+	echo "解析详情： $url\n";
 	$imageCache = "./img/";
 	$detailLog = "./detail.log";
 	
