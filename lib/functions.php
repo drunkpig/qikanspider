@@ -258,4 +258,17 @@ function get_a_class_of_qikan($startUrl)
 	return $nameUrl;
 }
 
+function my_json_encode(array $data) {
+        $s= array();
+        foreach($data as $k => $v) {
+            if(is_array($v)) {
+                $v = my_json_encode($v);
+                $s[] = "\"$k\":$v";
+            }else{
+                $v = addslashes( str_replace( array("\n","\r"), '', $v));
+                $s[] = "\"$k\": \"$v\"";
+            }
+        }
+        return '{'.implode(', ', $s).'}';
+    }
 ?>

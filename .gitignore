@@ -1,7 +1,3 @@
-big
-small
-detail
-a.html
-cache
-cache1
-
+*.html
+*.log
+*.jpg

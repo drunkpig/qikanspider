@@ -127,11 +127,113 @@ function process($class, $content)
 	$dom->clear();
 }
 
+function parseDetail($class, $url, $content){
+	$imageCache = "./img/";
+	$detailLog = "./detail.log";
+	
+	$result = array();
+	$result['url'] = $url;
+	$result['class'] = $class;
+	
+	$dom = new simple_html_dom();
+	$html = $dom->load($content);
+	
+	//1,期刊封面
+	$node = $dom->find("img#periodicalImage");
+	$node = $node[0];
+	$imgUrl = $node->src;
+	$imgContent = file_get_contents($imgUrl);
+	$imgFile = $imageCache . md5($imgUrl).".jpg";
+	file_put_contents($imgFile, $imgContent);
+	$result['image_little'] = $imgFile;
+	//2,中文名称
+	$node = $dom->find("div.qkhead_list_qk h1");
+	$node = $node[0];
+	$bookName = $node->plaintext;
+	$result['book_name_zh'] = trim($bookName);
+	//3,英文名称
+	$node = $dom->find("p#qkhead_en");
+	if(count($node)>0){
+		$node = $node[0];
+		$bookName = $node->plaintext;
+		$result['book_name_en'] = trim($bookName);
+	}
+	
+	//4,期刊简介
+	$node = $dom->find("p.qikan_info");
+	if(count($node)>0){
+		$node = $node[0];
+		$jianjie = $node->plaintext;
+		$result['qikan_jianjie'] = trim($jianjie);
+	}
+	//5,主要栏目
+	$node = $dom->find("div.qikan_lm");
+	if(count($node)>0){
+		$node = $node[0];
+		$node = $node->find("span");
+	}
+		
+	if(count($node)>0){
+		$lanmu = "";
+		foreach($node as $nd){
+			$lm = trim($nd->plaintext);
+			$lanmu .= ($lm . "#");
+		}
+		$result['qikan_lanmu'] = $lanmu;
+	}
+	//6,期刊信息
+	$node = $dom->find("div.qikan_lm");
+	if(count($node)>=2){
+		$node = $node[1];
+		$node = $node->find("p");
+		
+		if(count($node)>0){
+		$info = array();
+		foreach($node as $nd){
+			$text = $nd->plaintext;
+			$arr = explode("：", $text);
+			$key = "";
+			$val = "";
+			if(count($arr)==1){
+				$val = trim($arr[0]);
+			}
+			else if(count($arr)==2){
+				$key = trim($arr[0]);
+				$val = trim($arr[1]);
+			}
+			$info[$key] = $val;
+		}
+		$result['qikan_info'] = $info;
+	}
+	}
+	
+	//7,获奖情况
+	$node = $dom->find("div.qikan_lm");
+	if(count($node)>2){
+		$node = $node[count($node)-1];
+		$info = array();
+		$node = $node->find("span");
+		foreach($node as $nd){
+			$info[] = trim($nd->plaintext);
+		}
+		
+		$result['huo_jiang'] = $info;
+	}
+	
+	file_put_contents($detailLog, my_json_encode($result) . "\n", FILE_APPEND);
+	
+	$dom->clear();
+}
+
 ?>
 
 
 <?php
 
+	$url = "http://c.wanfangdata.com.cn/PeriodicalProfile-jcfy.aspx";
+	$content = file_get1($url);
+	parseDetail("thisis-class", $url, $content);
+	exit;
 	$potral = "http://c.wanfangdata.com.cn/Periodical.aspx";
 	$content = file_get_contents($potral);
 	fsave("./cache/index.html", $content);
@@ -188,6 +290,24 @@ function process($class, $content)
 				process($class, $content);
 			}
 		}
-
 	}
+	
+	/**
+	 * 根据index.log里的内容解析详细的数据，
+	 * 解析之后的数据放在detail.log里，以json的形式
+	 */
+	 $fp = fopen("./index.log", "r");
+	 $line = "";
+	 while(($line=fgets($fp))){
+		 if(strlen($line)>0){
+			 $arr = explode("\t", $line);
+			 $class = $arr[0];
+			 $url = $arr[1];
+			 $content = file_get1($url);
+			 parseDetail($class, $url, $content);
+		 }
+	 }
+	 
+	
+	
 ?>
