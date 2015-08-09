@@ -5,6 +5,7 @@ require_once "../lib/functions.php";
 
 function file_get1($filePath)
 {
+	$filePath = trim($filePath);#有换行会导致file_get_contents报404
 	$fname = md5($filePath).".html";
 	$fname = "./cache/$fname";
 	echo "$fname get ";
