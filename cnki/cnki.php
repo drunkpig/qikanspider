@@ -2,8 +2,8 @@
 require_once "../lib/functions.php";
 
 $portal = array(
-                "×ÔÈ»¿ÆÑ§Óë¹¤³Ì¼¼Êõ" => "http://epub.cnki.net/kns/oldnavi/n_Navi.aspx?NaviID=116&Flg=", 
-                //"ÈËÎÄÉç»á¿ÆÑ§"       => "http://epub.cnki.net/kns/oldnavi/n_Navi.aspx?NaviID=117&Flg="
+                "è‡ªç„¶ç§‘å­¦ä¸Žå·¥ç¨‹æŠ€æœ¯" => "http://epub.cnki.net/kns/oldnavi/n_Navi.aspx?NaviID=116&Flg=", 
+                "äººæ–‡ç¤¾ä¼šç§‘å­¦"       => "http://epub.cnki.net/kns/oldnavi/n_Navi.aspx?NaviID=117&Flg="
 			   );
 
 foreach($portal as $k=>$u)
@@ -14,8 +14,7 @@ foreach($portal as $k=>$u)
 	{
 		echo "Begin to get $c\n";
 		$info = get_a_class_of_qikan($pageu);
-		//echo "SAVE $c\n";
-		//TODO ±£´æ
+		var_dump($info);
 		echo "End get $c\n";
 	}
 }
