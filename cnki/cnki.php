@@ -1,6 +1,30 @@
 <?php 
 require_once "../lib/functions.php";
 
+/**
+ * 获取图片，根据大小过滤:小于1Kb的删除重新抓
+ * @param $imgUrl
+ */
+function img_get_file($imgUrl){
+    $imageCache = "./img/";
+    $imgFile = $imageCache . md5($imgUrl).".jpg";
+    if(file_exists($imgFile)){
+        $imgContent = file_get_contents($imgFile);
+        $len = strlen($imgContent);
+        echo $len . " >>>>\n";
+        if($len<2048){
+            unlink($imgFile);
+            echo "delete file $imgFile\n";
+        }
+    }
+
+    if(!file_exists($imgFile)){
+        $imgContent = file_get_contents($imgUrl);
+        file_put_contents($imgFile, $imgContent);
+    }
+    return $imgFile;
+}
+
 function file_get1($filePath)
 {
     $filePath = trim($filePath);#有换行会导致file_get_contents报404
