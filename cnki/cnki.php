@@ -68,7 +68,7 @@ function parseDetail($bigClass, $subClass, $info)
         if(count($fengmian)>0){
             $fengmian = $fengmian[0];
             $imgSrc = $fengmian->src;
-            $imgSrc = substr($imgSrc, strlen("/fengmian/")+1);
+            $imgSrc = substr($imgSrc, strlen("/fengmian/"));
             $src = "http://c61.cnki.net/" . $imgSrc;
             $result['fengmian'] = img_get_file($src);
         }
