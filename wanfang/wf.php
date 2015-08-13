@@ -3,30 +3,6 @@ require_once "../lib/simple_html_dom.php";
 require_once "../lib/HttpClient.class.php";
 require_once "../lib/functions.php";
 
-function file_get1($filePath)
-{
-	$filePath = trim($filePath);#有换行会导致file_get_contents报404
-	$fname = md5($filePath).".html";
-	$fname = "./cache/$fname";
-	echo "$fname get ";
-	if(file_exists($fname))
-	{
-		echo " from cache.\n";
-		return file_get_contents($fname);
-	}
-	else
-	{
-		$content = file_get_contents($filePath);
-		if(strlen($content)>100){
-			file_put_contents($fname, $content);
-			echo " from net.\n";
-			sleep(1);
-		}
-		else echo " from net but too small.\n";
-		return $content;
-	}
-}
-
 function saveResult($line)
 {
 	$fp = fopen("./index.log", "a+");
@@ -131,30 +107,6 @@ function process($class, $content)
 		saveResult("$key\t$url\n");
 	}
 	$dom->clear();
-}
-
-/**
- * 获取图片，根据大小过滤:小于1Kb的删除重新抓
- * @param $imgUrl
- */
-function img_get_file($imgUrl){
-    $imageCache = "./img/";
-    $imgFile = $imageCache . md5($imgUrl).".jpg";
-    if(file_exists($imgFile)){
-        $imgContent = file_get_contents($imgFile);
-        $len = strlen($imgContent);
-        echo $len . " >>>>\n";
-        if($len<2048){
-            unlink($imgFile);
-            echo "delete file $imgFile\n";
-        }
-    }
-
-    if(!file_exists($imgFile)){
-        $imgContent = file_get_contents($imgUrl);
-        file_put_contents($imgFile, $imgContent);
-    }
-    return $imgFile;
 }
 
 function parseDetail($class, $url, $content){

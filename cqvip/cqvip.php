@@ -1,4 +1,75 @@
 <?php
+require_once "../lib/simple_html_dom.php";
+require_once "../lib/HttpClient.class.php";
+require_once "../lib/functions.php";
+
+function saveUrl($u){
+    file_put_contents("./detailUrl.log", $u."\n", FILE_APPEND);
+}
+
+/**
+ * 获取一个页面上的详细期刊链接地址
+ * @param $url
+ * @return array
+ */
+function getDetailUrl($url){
+    $detailUrl = array();//全部的详情页面
+
+    $content = file_get1($url);
+    $dom = new simple_html_dom();
+    $html = $dom->load($content);
+    $node = $html->find("div#journallistpanel table a");
+    if(count($node)>0){
+        foreach($node as $a){
+            $u = $a->href;
+            $detailUrl[] = $u;
+        }
+    }
+
+    return $detailUrl;
+}
+
+/**
+ * 解析详情页
+ * @param $content
+ */
+function parseCqvipDetail($content){
+    $result = array();
+
+    $dom = new simple_html_dom();
+    $html = $dom->load($content);
+    $classList = $html->find("div.magsearch span.song");
+    $classList = $classList[0];
+    $tex = $classList->plaintext;
+    $tex = str_replace("&gt;", ">", $tex);
+    $arr = explode(">", $tex);
+    $class  = "";
+    for($i=2; $i<count($arr)-1; $i++){
+        $class .= trim($arr[$i])."#";
+    }
+    $class .= trim($arr[count($arr)-1]);
+    $result['class'] = $class;
+
+    $dom->clear();
+
+    return $result;
+}
+
+function getCover($content){
+    $dom = new simple_html_dom();
+    $html = $dom->load($content);
+    $img = $html->find("td.magcover img");
+    if(count($img)>0){
+        $img = $img[0];
+        $src = $img->src;
+        img_get_file($src);
+    }
+    else{
+        echo "没有发现封皮\n";
+    }
+
+    $dom->clear();
+}
 $portal = array(
     "http://www.cqvip.com/Journal/2.shtml",
     "http://www.cqvip.com/Journal/3.shtml",
@@ -70,5 +141,40 @@ $portal = array(
     "http://www.cqvip.com/Journal/69.shtml",
 );
 
-?>
+foreach($portal as $url){
+    $detailUrl = getDetailUrl($url);
 
+    /*pagger*/
+    $content = file_get1($url);
+    $dom = new simple_html_dom();
+    $html = $dom->load($content);
+    $paggerUrl = array();
+    $pagger = $html->find("div.pager ul.pagenum a");
+    $paggerUrlPrefix = "http://www.cqvip.com";
+    if(count($pagger)>0){
+        foreach($pagger as $a){
+            $href = $a->href;
+            $u = $paggerUrlPrefix . $href;
+            $paggerUrl[] = $u;
+        }
+    }
+
+    foreach($paggerUrl as $pgUrl){
+        $detailUrlTemp = getDetailUrl($pgUrl);
+        $detailUrl = array_merge($detailUrl, $detailUrlTemp);
+    }
+
+    /*抓全部的url*/
+    foreach($detailUrl as $url){
+        $content = file_get1($url);
+        if(strlen($content)>100){//至少不是空的
+            $result = parseCqvipDetail($content);
+            getCover($content);
+            saveUrl($result['class'] . "\t" . $url);
+            file_put_contents("./detail.log", my_json_encode($result)."\n", FILE_APPEND);
+        }
+    }
+
+    $dom->clear();
+}
+?>
