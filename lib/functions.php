@@ -324,9 +324,18 @@ function img_get_file($imgUrl){
 
     if(!file_exists($imgFile)){
         $imgContent = file_get_contents($imgUrl);
-        file_put_contents($imgFile, $imgContent);
+
         $len = strlen($imgContent);
-        echo "save image: $imgFile, size=$len\n";
+		if($len >2048){
+			file_put_contents($imgFile, $imgContent);
+			echo "save image: $imgFile, size=$len\n";
+		}
+		else{
+			echo "image: $imgFile, size=$len, too small not save\n";
+		}
+
+
+		sleep(3);
     }
     return $imgFile;
 }

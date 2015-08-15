@@ -44,7 +44,10 @@ function parseDetailUrl($url){
     $node = $html->find("div.imgBox a");
     if(count($node)>0){
         foreach($node as $a){
-            $u = $a->href;
+            $u = trim($a->href);
+            if(substr($u, 0, strlen("http"))!="http") {
+                $u = "http://bk.11185.cn/".$u;
+            }
             $detailUrl[] = $u;
         }
     }
@@ -92,12 +95,17 @@ function parse11185DetailPage($url){
     $content = file_get1($url);
     $dom = new simple_html_dom();
     $html = $dom->load($content);
-    $node = $html->find("div.right div a");
-    $class = "";
-    foreach($node as $n){
-        $class .= (trim($n->plaintext) . "#");
+    $node = $html->find("div.right div");
+    if(count($node)>0){//分类
+        $node = $node[0];
+        $plaintext = $node->plaintext;
+        $arr = explode("-&gt;", $plaintext);
+        $class = "";
+        foreach($arr as $key){
+            $class .= (trim($key)."#");
+        }
+        $result['class'] = $class;
     }
-    $result['class'] = $class;
 
     $node = $html->find("div#name h1");//刊物名称
     if(count($node)>0){
@@ -106,9 +114,25 @@ function parse11185DetailPage($url){
         $result['book_name_zh'] = $bookName;
     }
 
+    $node = $html->find("img#smallimg");//封面图片
+    if(count($node)>0){
+        $node = $node[0];
+        $src = "http://bk.11185.cn/" . $node->src;
+        echo "$src\n";
+        $imgFile = img_get_file($src);
+        $result['image_big'] = $imgFile;
+    }
+    else{
+        echo "没有找到图片\n";
+    }
+
     $dom->clear();
     return $result;
 }
+
+//$udetail = "http://bk.11185.cn/index/detail.do?method=getCataDetail&pressCode=1-38";
+//var_dump(parse11185DetailPage($udetail));
+//exit;
 
 foreach($portal as $url){
     echo "parsePagger\n";
