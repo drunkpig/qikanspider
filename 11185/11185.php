@@ -100,10 +100,7 @@ function parse11185DetailPage($url){
         $node = $node[0];
         $plaintext = $node->plaintext;
         $arr = explode("-&gt;", $plaintext);
-        $class = "";
-        foreach($arr as $key){
-            $class .= (trim($key)."#");
-        }
+        $class = my_join("#", $arr);
         $result['class'] = $class;
     }
 
@@ -124,6 +121,68 @@ function parse11185DetailPage($url){
     }
     else{
         echo "没有找到图片\n";
+    }
+
+    $kvMap = array();
+    $keyMap = array(
+        "单价"=>"dan_jia",
+        "季价"=>"ji_du_jia",
+        "半年价"=>"ban_nian_jia",
+        "全年价"=>"quan_nian_jia",
+        "出版社"=>"chu_ban_she",
+        "发报刊局"=>"fa_bao_kan_ju",
+        "国内标准刊号"=>"guo_nei_biao_zhun_kan_hao",
+        "邮发编号"=>"you_fa_bian_hao",
+        "发行年份"=>"fa_xing_nian_fen",
+        "报刊种类"=>"bao_kan_zhong_lei",
+        "期刊类别"=>"bao_kan_lei_bie",
+        "出版日期"=>"chu_ban_ri_qi",
+    );
+    $node = $html->find("ul#my-price li");//价格属性
+    if(count($node)>0){
+        foreach($node as $li){
+            $text = trim($li->plaintext);
+            $text = str_replace("&nbsp;", "", $text);
+            $text = str_replace(" ", "", $text);
+
+            $arr = explode("：", $text);
+            if(count($arr)==2){
+                $kvMap[trim($arr[0])] = trim($arr[1]);
+            }
+        }
+    }
+
+    $node = $html->find("ul.detail-list li");//刊号，出版日期，等
+    if(count($node)>0){
+        foreach($node as $li){
+            $text = $li->plaintext;
+            $arr = explode("：", $text);
+            if(count($arr)==2){
+                $kvMap[trim($arr[0])] = trim($arr[1]);
+            }
+        }
+    }
+
+    foreach($kvMap as $key=>$value){
+        $realKey = $keyMap[$key];
+        $result[$realKey] = $value;
+    }
+
+    $node = $html->find("div.con");
+    $len = count($node);
+    if($len==2){
+        $nd = $node[0];
+        $jianjie = trim($nd->plaintext);
+        $result['jianjie'] = $jianjie;
+
+        $nd = $node[1];
+        $lanmu = trim($nd->plaintext);
+        $arr = explode("\n", $lanmu);
+        $lanmu = my_join("#", $arr);
+        $result['lanmu'] = $lanmu;
+    }
+    else{
+        file_put_contents("./error.log", "", FILE_APPEND);
     }
 
     $dom->clear();
