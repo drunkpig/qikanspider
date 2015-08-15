@@ -156,6 +156,21 @@ function parse11185DetailPage($url){
     if(count($node)>0){
         foreach($node as $li){
             $text = $li->plaintext;
+            $text = str_replace("&nbsp;", "", $text);
+            $text = str_replace(" ", "", $text);
+            $arr = explode("：", $text);
+            if(count($arr)==2){
+                $kvMap[trim($arr[0])] = trim($arr[1]);
+            }
+        }
+    }
+
+    $node = $html->find("li#summary-ph");//刊号，出版日期，等
+    if(count($node)>0){
+        foreach($node as $li){
+            $text = $li->plaintext;
+            $text = str_replace("&nbsp;", "", $text);
+            $text = str_replace(" ", "", $text);
             $arr = explode("：", $text);
             if(count($arr)==2){
                 $kvMap[trim($arr[0])] = trim($arr[1]);
