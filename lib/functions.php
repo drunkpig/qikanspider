@@ -339,4 +339,14 @@ function img_get_file($imgUrl){
     }
     return $imgFile;
 }
+
+function my_join($joinChar, $array){
+    array_walk($array, function(&$val, $key){
+        $val = trim($val);
+    });
+    $str = join($joinChar, $array);
+
+    return $str;
+}
+
 ?>
