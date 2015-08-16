@@ -1,0 +1,70 @@
+<?php
+require_once "../lib/simple_html_dom.php";
+require_once "../lib/HttpClient.class.php";
+require_once "../lib/functions.php";
+
+/**
+ * @param $i
+ * @return string  下一个列表页面url
+ */
+function getNextListPage($i){
+    $portal = "http://emuch.net/bbs/journal_cn.php?from=emuch&view=&classid=0&class_credit=0&page=$i";
+    return "";
+}
+
+/**
+ * @param $u 从这个页面上获得最大的分页数目
+ */
+function getMaxPage($u){
+    $content = file_get1($u);
+    $dom = new simple_html_dom();
+    $html = $dom->load($content);
+    $node = $html->find("table.multi td.header");
+    $node = $node[1];
+    $arr = explode("/", trim($node->plaintext));
+
+    $dom->clear();
+    return trim($arr[1]);
+}
+
+/**
+ * @param $u  从这个页面上获取详情页的url列表
+ */
+function parseDetailPageList($u){
+    $content = file_get1($u);
+    $dom = new simple_html_dom();
+    $html = $dom->load($content);
+    $node = $html->find("div#bbsmain table");
+
+    $list = array();
+    foreach($node as $tb){
+        $table1 = $tb->find("table[cellpadding=5]", 0);
+        if($table1){
+            /*检查是不是6列，根据tr.header*/
+            $hd = $table1->find("tr.header td");
+            if(count($hd)!=6){
+                echo "skip table\n";
+                continue;
+            }
+            $as = $table1->find("a");
+
+            foreach($as as $a){
+                $href = $a->href;
+                $u = "http://emuch.net/bbs/$href";
+                $list[] = $u;
+                $book_name = $a->plaintext;
+                file_put_contents("./emuch_zh_url.log", "$book_name\t$u\n", FILE_APPEND);
+            }
+        }
+    }
+
+    $dom->clear();
+
+    return $list;
+}
+
+
+
+$udetail = "http://emuch.net/bbs/journal_cn.php?from=emuch&view=&classid=0&class_credit=0&page=2";
+var_dump(parseDetailPageList($udetail));
+exit;
