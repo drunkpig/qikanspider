@@ -31,7 +31,7 @@ function parseDetail($bigClass, $subClass, $info)
             $text = str_replace("<strong>历史沿革：</strong>", "", $text);
             $text = str_replace("&nbsp;", "", $text);
             var_dump($text);
-
+            //TODO
         }
 
         saveDetail($result);
