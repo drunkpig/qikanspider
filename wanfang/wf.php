@@ -187,8 +187,12 @@ function parseDetail($class, $url, $content){
 
 	//6,期刊信息
 	$node = $dom->find("div.qikan_lm");
-	if(count($node)>=2){
-		$node = $node[1+$hasCengYongMing];
+	if(count($node)>=2){//处理情况http://c.wanfangdata.com.cn/PeriodicalProfile-sjmz.aspx
+        $i = 1+$hasCengYongMing;
+        if(count($node)==2){
+            $i = 0;
+        }
+		$node = $node[$i];
 		$node = $node->find("p");
 		
 		if(count($node)>0){
