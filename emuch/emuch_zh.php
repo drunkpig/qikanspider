@@ -51,6 +51,7 @@ function getMaxPage($u){
 function parseDetailInfo($url){
     global $keyMap;
     $content = file_get1($url);
+    $content =  iconv('GB2312', 'UTF-8', $content);
     $result = array();
     $result['url'] = $url;
     $dom = new simple_html_dom();
@@ -80,6 +81,14 @@ function parseDetailInfo($url){
             }
         }
     }
+
+    /*事后格式化*/
+    $result['shu_ju_ku_shou_lu'] = str_replace("&nbsp;", "", $result['shu_ju_ku_shou_lu']);
+    $result['shu_ju_ku_shou_lu'] = preg_replace("/\s+/", "#", $result['shu_ju_ku_shou_lu']);
+
+    $result['lan_mu'] = str_replace("&nbsp;", "", $result['lan_mu']);
+    $result['lan_mu'] = str_replace(" ", "#", $result['lan_mu']);
+    $result['lan_mu'] = preg_replace("/\(.*?\)/", "", $result['lan_mu']);
 
     return $result;
 }
