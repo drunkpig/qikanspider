@@ -158,11 +158,12 @@ function parseDetail($class, $url, $content){
 	}
 		
 	if(count($node)>0){
-		$lanmu = "";
+		$lanmuArr = array();
 		foreach($node as $nd){
 			$lm = trim($nd->plaintext);
-			$lanmu .= ($lm . "#");
+			$lanmuArr[] = $lm;
 		}
+		$lanmu = my_join("#", $lanmuArr);
 		$result['qikan_lanmu'] = $lanmu;
 	}
 	echo "[5]主要栏目->";
@@ -174,21 +175,33 @@ function parseDetail($class, $url, $content){
 		
 		if(count($node)>0){
 		$info = array();
-		foreach($node as $nd){
-			$text = $nd->plaintext;
-			$arr = explode("：", $text);
-			$key = "";
-			$val = "";
-			if(count($arr)==1){
-				$val = trim($arr[0]);
-			}
-			else if(count($arr)==2){
-				$key = trim($arr[0]);
-				$val = trim($arr[1]);
-			}
-			$info[$key] = $val;
-		}
-		$result['qikan_info'] = $info;
+		foreach($node as $nd) {
+            $text = $nd->plaintext;
+            $arr = explode("：", $text);
+            $key = "";
+            $val = "";
+            if (count($arr) == 1) {
+                $val = trim($arr[0]);
+            } else if (count($arr) == 2) {
+                $key = trim($arr[0]);
+                $val = trim($arr[1]);
+            }
+            $info[$key] = $val;
+        }
+        $kvMap = array(
+            "主管单位" => "zhu_guan_dan_wei",
+            "主办单位" => "zhu_ban_dan_wei",
+            "主编" => "zhu_bian",
+            "ISSN" => "issn",
+            "CN" => "cn",
+            "地址" => "di_zhi",
+            "邮政编码" => "you_zheng_bian_ma",
+            "电话" => "dian_hua",
+            "Email" => "email",
+            "网址" => "site",
+        );
+        $info = array_key_replace($kvMap, $info);
+		$result = array_merge($info, $result);
 	}
 	}
 	echo "[6]详细信息->";
@@ -202,7 +215,7 @@ function parseDetail($class, $url, $content){
 			$info[] = trim($nd->plaintext);
 		}
 		
-		$result['huo_jiang'] = $info;
+		$result['huo_jiang'] = my_join("#", $info);
 	}
 	echo "[7]获奖情况\n";
 	file_put_contents($detailLog, my_json_encode($result) . "\n", FILE_APPEND);

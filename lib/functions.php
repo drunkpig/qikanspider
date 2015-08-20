@@ -349,4 +349,11 @@ function my_join($joinChar, $array){
     return $str;
 }
 
+function array_key_replace($kvMap, $array){
+    $arr = array();
+    foreach($kvMap as $key=>$val){
+        $arr[$val] = $array[$key];
+    }
+    return $arr;
+}
 ?>
