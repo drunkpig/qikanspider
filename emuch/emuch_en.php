@@ -4,7 +4,7 @@ require_once "../lib/HttpClient.class.php";
 require_once "../lib/functions.php";
 
 $keyMap = array(
-    "期刊名"=>"book_name_zh",
+    "期刊名"=>"book_name_en",
 
     "出版周期"=>"chu_ban_zhou_qi",
     "出版ISSN"=>"issn",
@@ -47,6 +47,7 @@ function getMaxPage($u){
 function parseDetailInfo($url){
     global $keyMap;
     $content = file_get1($url);
+    $content =  iconv('GB2312', 'UTF-8', $content);
     $result = array();
     $result['url'] = $url;
     $dom = new simple_html_dom();
@@ -65,6 +66,23 @@ function parseDetailInfo($url){
                     $td2 = $tds[1];
                     $key = trim($td1->plaintext);
                     $value = trim($td2->plaintext);
+                    if($key=="期刊主页网址" || $key=="在线投稿网址"){
+                        $value = $td2->find("a",0);
+                        $value = $value->href;
+                    }
+                    if($key=='其他相关链接'){
+                        $value = $td2->find("a");
+                        $temp = array();
+                        if(count($value)>0){
+                            foreach($value as $a){
+                                $text = $a->plaintext;
+                                $text = str_replace("&amp;", "&", $text);
+                                $val = $a->href;
+                                $temp[] = trim($text) . "#" . trim($val);
+                            }
+                            $value = my_join("#", $temp);
+                        }
+                    }
                     $realKey = @$keyMap[$key];
                     if(strlen($realKey)>0){
                         $result[$realKey] = $value;
@@ -76,6 +94,10 @@ function parseDetailInfo($url){
             }
         }
     }
+    $result['lan_mu'] = str_replace("&nbsp;", "", $result['lan_mu']);
+    $result['lan_mu'] = str_replace(" ", "#", $result['lan_mu']);
+    $result['lan_mu'] = preg_replace("/\(.*?\)/", "", $result['lan_mu']);
+
 
     return $result;
 }
