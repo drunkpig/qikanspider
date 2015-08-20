@@ -335,7 +335,7 @@ function img_get_file($imgUrl){
 		}
 
 
-		sleep(3);
+		sleep(1);
     }
     return $imgFile;
 }
