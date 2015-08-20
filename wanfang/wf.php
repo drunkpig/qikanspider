@@ -149,11 +149,28 @@ function parseDetail($class, $url, $content){
 		$jianjie = $node->plaintext;
 		$result['qikan_jianjie'] = trim($jianjie);
 	}
-	echo "[4]期刊简介->";
+	echo "[4]期刊简介->曾用名->";
+    //+曾用名
+    $hasCengYongMing = 0;
+    $node = $dom->find("div.qikan_lm");
+    if(count($node)>0){
+        $node = $node[0];
+        $node = $node->find("p");
+        if(count($node)==2){
+            $cengYongMing = trim($node[0]->plaintext);
+            if($cengYongMing=="曾用名"){
+                $hasCengYongMing = 1;
+            }
+            $val = trim($node[1]->plaintext);
+            $result['ceng_yong_ming'] = $val;
+
+        }
+    }
+
 	//5,主要栏目
 	$node = $dom->find("div.qikan_lm");
 	if(count($node)>0){
-		$node = $node[0];
+		$node = $node[0+$hasCengYongMing];
 		$node = $node->find("span");
 	}
 		
@@ -167,42 +184,53 @@ function parseDetail($class, $url, $content){
 		$result['qikan_lanmu'] = $lanmu;
 	}
 	echo "[5]主要栏目->";
+
 	//6,期刊信息
 	$node = $dom->find("div.qikan_lm");
 	if(count($node)>=2){
-		$node = $node[1];
+		$node = $node[1+$hasCengYongMing];
 		$node = $node->find("p");
 		
 		if(count($node)>0){
-		$info = array();
-		foreach($node as $nd) {
-            $text = $nd->plaintext;
-            $arr = explode("：", $text);
-            $key = "";
-            $val = "";
-            if (count($arr) == 1) {
-                $val = trim($arr[0]);
-            } else if (count($arr) == 2) {
-                $key = trim($arr[0]);
-                $val = trim($arr[1]);
+            $info = array();
+            foreach($node as $nd) {
+                $text = $nd->plaintext;
+                $arr = explode("：", $text);
+                $key = "";
+                $val = "";
+                if (count($arr) == 1) {
+                    $key = trim($arr[0]);
+                } else if (count($arr) == 2) {
+                    $key = trim($arr[0]);
+                    $val = trim($arr[1]);
+                }
+                $info[$key] = $val;
             }
-            $info[$key] = $val;
+
+            $kvMap = array(
+                "主管单位" => "zhu_guan_dan_wei",
+                "主办单位" => "zhu_ban_dan_wei",
+                "主编" => "zhu_bian",
+                "ISSN" => "issn",
+                "CN" => "cn",
+                "地址" => "di_zhi",
+                "邮政编码" => "you_zheng_bian_ma",
+                "电话" => "dian_hua",
+                "Email" => "email",
+                "网址" => "site",
+            );
+
+            $info = array_key_replace($kvMap, $info);
+            $info["email"] = strtolower($info["email"]);
+            $info["site"] = strtolower($info["site"]);
+            $info['zhu_ban_dan_wei'] = str_replace("  ", "#", $info['zhu_ban_dan_wei']);
+            $info['dian_hua'] = str_replace(" ", "#", $info['dian_hua']);
+            $result = array_merge($info, $result);
+
         }
-        $kvMap = array(
-            "主管单位" => "zhu_guan_dan_wei",
-            "主办单位" => "zhu_ban_dan_wei",
-            "主编" => "zhu_bian",
-            "ISSN" => "issn",
-            "CN" => "cn",
-            "地址" => "di_zhi",
-            "邮政编码" => "you_zheng_bian_ma",
-            "电话" => "dian_hua",
-            "Email" => "email",
-            "网址" => "site",
-        );
-        $info = array_key_replace($kvMap, $info);
-		$result = array_merge($info, $result);
-	}
+        else{
+            echo "没找到\n";
+        }
 	}
 	echo "[6]详细信息->";
 	//7,获奖情况
@@ -221,6 +249,7 @@ function parseDetail($class, $url, $content){
 	file_put_contents($detailLog, my_json_encode($result) . "\n", FILE_APPEND);
 	
 	$dom->clear();
+    return $result;
 }
 
 ?>
@@ -228,10 +257,12 @@ function parseDetail($class, $url, $content){
 
 <?php
 
-	// $url = "http://c.wanfangdata.com.cn/PeriodicalProfile-jcfy.aspx";
-	// $content = file_get1($url);
-	// parseDetail("thisis-class", $url, $content);
-	// exit;
+	 $url = "http://c.wanfangdata.com.cn/PeriodicalProfile-zxdt.aspx";
+	 $content = file_get1($url);
+	 $r = parseDetail("thisis-class", $url, $content);
+   var_dump($r);
+	 exit;
+
 	$potral = "http://c.wanfangdata.com.cn/Periodical.aspx";
 	$content = file_get_contents($potral);
 	fsave("./cache/index.html", $content);
