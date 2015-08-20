@@ -257,11 +257,11 @@ function parseDetail($class, $url, $content){
 
 <?php
 
-	 $url = "http://c.wanfangdata.com.cn/PeriodicalProfile-zxdt.aspx";
-	 $content = file_get1($url);
-	 $r = parseDetail("thisis-class", $url, $content);
-   var_dump($r);
-	 exit;
+//	 $url = "http://c.wanfangdata.com.cn/PeriodicalProfile-zxdt.aspx";
+//	 $content = file_get1($url);
+//	 $r = parseDetail("thisis-class", $url, $content);
+//   var_dump($r);
+//	 exit;
 
 	$potral = "http://c.wanfangdata.com.cn/Periodical.aspx";
 	$content = file_get_contents($potral);
