@@ -5,7 +5,7 @@ require_once "../lib/functions.php";
 
 function saveResult($line)
 {
-	$fp = fopen("./index.log", "a+");
+	$fp = fopen("./detail_url.log", "a+");
 	fwrite($fp, $line);
 	fclose($fp);
 	echo "SAVE ............. $line";
@@ -16,7 +16,7 @@ function saveCore($arr, $u){
 		echo "$key\t$u\n";
 		fwrite($fp, "$key\n");
 	}
-	var_dump($arr);
+	//var_dump($arr);
 	fclose($fp);
 }
 function savePrePub($arr, $u){
@@ -25,7 +25,7 @@ function savePrePub($arr, $u){
 		echo "$key\t$u\n";
 		fwrite($fp, "$key\n");
 	}
-	var_dump($arr);
+	//var_dump($arr);
 	fclose($fp);
 }
 
@@ -294,7 +294,7 @@ function parseDetail($class, $url, $content){
 	 * 根据index.log里的内容解析详细的数据，
 	 * 解析之后的数据放在detail.log里，以json的形式
 	 */
-	 $fp = fopen("./index.log", "r");
+	 $fp = fopen("./detail_url.log", "r");
 	 $line = "";
 	 while(($line=fgets($fp))){
 		 if(strlen($line)>0){
