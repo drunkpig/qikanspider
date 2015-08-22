@@ -46,16 +46,22 @@ function parseCqvipDetail($u){
     $dom = new simple_html_dom();
     $html = $dom->load($content);
     $classList = $html->find("div.magsearch span.song");
-    $classList = $classList[0];
-    $tex = $classList->plaintext;
-    $tex = str_replace("&gt;", ">", $tex);
-    $arr = explode(">", $tex);
-    $class  = "";
-    for($i=2; $i<count($arr)-1; $i++){
-        $class .= trim($arr[$i])."#";
+    if($classList){
+        $classList = $classList[0];
+        $tex = $classList->plaintext;
+        $tex = str_replace("&gt;", ">", $tex);
+        $arr = explode(">", $tex);
+        $class  = "";
+        for($i=2; $i<count($arr)-1; $i++){
+            $class .= trim($arr[$i])."#";
+        }
+        $class .= trim($arr[count($arr)-1]);
+        $result['class'] = $class;
     }
-    $class .= trim($arr[count($arr)-1]);
-    $result['class'] = $class;
+    else{
+        return $result;
+    }
+
 
     $bookNameCn = $html->find("h1.f20", 0);
     if($bookNameCn){
@@ -318,6 +324,10 @@ foreach($portal as $url){
         $content = file_get1($url);
         if(strlen($content)>100){//至少不是空的
             $result = parseCqvipDetail($u);
+            if(count($result)<=0){
+                echo "抓到没有数据页面 $url\n";
+                continue;
+            }
             getCover($content);
             saveUrl($result['class'] . "\t" . $url);
             file_put_contents("./cqvip_detail.log", my_json_encode($result)."\n", FILE_APPEND);
