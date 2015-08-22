@@ -115,6 +115,10 @@ function parseDetail($bigClass, $subClass, $info)
         $t = str_replace("#", "",  $t);
         $result['chuang_kan_shi_jian'] = $t;
 
+        $t = $result['yu_zhong'];
+        $t = str_replace(";", "#",  $t);
+        $result['yu_zhong'] = $t;
+
         $t = $result['book_name_zh'];
         $arr = explode("#", $t);
         $name1 = $arr[0];
