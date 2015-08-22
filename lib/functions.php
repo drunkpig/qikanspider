@@ -238,7 +238,7 @@ function resetClient()
 /**
  * 解析一个类别的，多页
  */
-function get_a_class_of_qikan($startUrl)
+function get_a_class_of_qikan($class, $startUrl)
 {
 	resetClient();
 	//echo "StartUrl : $startUrl\n";
@@ -255,6 +255,9 @@ function get_a_class_of_qikan($startUrl)
 		$ot = parse_ot_page($pageCount, $content, $startUrl);
 	}
 	$nameUrl = array_merge($nameUrl, $ot);
+	foreach($nameUrl as $u){
+        file_put_contents("./cnki_url.log", "$class\t$u\n", FILE_APPEND);
+    }
 	return $nameUrl;
 }
 
