@@ -92,6 +92,7 @@ function parsePagger($u){
 
 function parse11185DetailPage($url){
     $result = array();
+    $result['url'] = $url;
     $content = file_get1($url);
     $dom = new simple_html_dom();
     $html = $dom->load($content);
@@ -123,7 +124,6 @@ function parse11185DetailPage($url){
         echo "没有找到图片\n";
     }
 
-    $kvMap = array();
     $keyMap = array(
         "单价"=>"dan_jia",
         "季价"=>"ji_du_jia",
@@ -137,6 +137,7 @@ function parse11185DetailPage($url){
         "报刊种类"=>"bao_kan_zhong_lei",
         "期刊类别"=>"bao_kan_lei_bie",
         "出版日期"=>"chu_ban_ri_qi",
+
     );
     $node = $html->find("ul#my-price li");//价格属性
     if(count($node)>0){
@@ -151,6 +152,39 @@ function parse11185DetailPage($url){
             }
         }
     }
+
+    $node = $html->find("li#summary-ph", 0);
+    if($node){
+        $text  = trim($node->plaintext);
+
+        $text = str_replace("&nbsp;", "", $text);
+        $text = str_replace(" ", "", $text);
+        $text = str_replace("   ", "", $text);
+
+        $arr = explode("：", $text);
+        if(count($arr)==2){
+
+            $key = trim($arr[0]);
+            $value = trim($arr[1]);
+            $result['chu_ban_she'] = $value;
+        }
+    }
+
+    $node = $html->find("ul#summary", 0);
+    if(count($node)>0){
+        $li = $node->last_child("li");
+        $text  = trim($li->plaintext);
+        $text = str_replace("&nbsp;", "", $text);
+        $text = str_replace(" ", "", $text);
+        $arr = explode("：", $text);
+        if(count($arr)==2){
+            $key = trim($arr[0]);
+
+            $value = trim($arr[1]);
+            $result["fa_bao_kan_ju"] = $value;
+        }
+    }
+
 
     $node = $html->find("ul.detail-list li");//刊号，出版日期，等
     if(count($node)>0){
@@ -217,8 +251,8 @@ foreach($portal as $url){
         foreach($detailUrl as $detailU){//针对每个详情页
             echo "parse11185DetailPage $detailU\n";
             $result = parse11185DetailPage($detailU);
-            file_put_contents("./detail.log", my_json_encode($result) . "\n", FILE_APPEND);
-            file_put_contents("detailUrl.log", $result['class'] . "\t".$detailU . "\n", FILE_APPEND);
+            file_put_contents("./11185_detail.log", my_json_encode($result) . "\n", FILE_APPEND);
+            file_put_contents("detail_url.log", $result['class'] . "\t".$detailU . "\n", FILE_APPEND);
         }
     }
 }
