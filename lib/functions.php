@@ -290,8 +290,9 @@ function file_get1($filePath)
         $html = $dom->load($content);
         $title = $html->find("title");
         $title = $title[0];
-        if($title && $title->plaintext=="404 - 找不到文件或目录。"){
+        if(($title && $title->plaintext=="404 - 找不到文件或目录。")||!$title){
             echo "404 ERROR $filePath\n";
+			$dom->clear();
             return "";//服务器出错
         }
         $dom->clear();
