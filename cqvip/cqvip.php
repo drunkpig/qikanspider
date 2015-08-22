@@ -295,10 +295,10 @@ $portal = array(
     "http://www.cqvip.com/Journal/69.shtml",
 );
 
-$u = "http://www.cqvip.com/qk/91994X/";
-$r = parseCqvipDetail($u);
-var_dump($r);
-exit;
+//$u = "http://www.cqvip.com/qk/91994X/";
+//$r = parseCqvipDetail($u);
+//var_dump($r);
+//exit;
 
 
 foreach($portal as $url){
