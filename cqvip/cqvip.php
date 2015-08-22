@@ -68,6 +68,11 @@ function parseCqvipDetail($u){
         $result['book_name_zh'] = trim($bookNameCn->plaintext);
     }
 
+    $bookNameEn = $html->find("h2.f10", 0);
+    if($bookNameEn){
+        $result['book_name_en'] = trim($bookNameEn->plaintext);
+    }
+
     $bookNameEn = $html->find("h1.f10", 0);
     if($bookNameEn){
         $result['book_name_en'] = $bookNameEn;
@@ -290,10 +295,10 @@ $portal = array(
     "http://www.cqvip.com/Journal/69.shtml",
 );
 
-//$u = "http://www.cqvip.com/qk/91994X/";
-//$r = parseCqvipDetail($u);
-//var_dump($r);
-//exit;
+$u = "http://www.cqvip.com/qk/91994X/";
+$r = parseCqvipDetail($u);
+var_dump($r);
+exit;
 
 
 foreach($portal as $url){
