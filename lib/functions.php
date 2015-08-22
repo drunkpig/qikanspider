@@ -288,8 +288,7 @@ function file_get1($filePath)
         $content = file_get_contents($filePath);
         $dom = new simple_html_dom();
         $html = $dom->load($content);
-        $title = $html->find("title");
-        $title = $title[0];
+        $title = $html->find("title", 0);
         if(($title && $title->plaintext=="404 - 找不到文件或目录。")||!$title){
             echo "404 ERROR $filePath\n";
 			$dom->clear();
