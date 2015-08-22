@@ -311,6 +311,7 @@ function file_get1($filePath)
  * @param $imgUrl
  */
 function img_get_file($imgUrl){
+
     $imageCache = "./img/";
     $imgFile = $imageCache . md5($imgUrl).".jpg";
     if(file_exists($imgFile)){
@@ -324,7 +325,10 @@ function img_get_file($imgUrl){
     }
 
     if(!file_exists($imgFile)){
-        $imgContent = file_get_contents($imgUrl);
+		if(strlen(trim($imgFile))>0){
+			$imgContent = file_get_contents($imgUrl);
+		}else $imgContent = "";
+
 
         $len = strlen($imgContent);
 		if($len >2048){
