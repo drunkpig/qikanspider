@@ -2,9 +2,9 @@
 require_once "../lib/simple_html_dom.php";
 require_once "../lib/HttpClient.class.php";
 require_once "../lib/functions.php";
-
+//http://lib.cqvip.com/evaluation/index.aspx
 function saveUrl($u){
-    file_put_contents("./detailUrl.log", $u."\n", FILE_APPEND);
+    file_put_contents("./cqvip_detail_url.log", $u."\n", FILE_APPEND);
 }
 
 /**
@@ -29,13 +29,20 @@ function getDetailUrl($url){
     return $detailUrl;
 }
 
+function getQkCode($url){
+    $arr = explode("/", $url);
+    $len = count($arr)-2;
+    return $arr[$len];
+}
+
 /**
  * 解析详情页
  * @param $content
  */
-function parseCqvipDetail($content){
+function parseCqvipDetail($u){
     $result = array();
-
+    $result['url'] = $u;
+    $content = file_get1($u);
     $dom = new simple_html_dom();
     $html = $dom->load($content);
     $classList = $html->find("div.magsearch span.song");
@@ -49,6 +56,142 @@ function parseCqvipDetail($content){
     }
     $class .= trim($arr[count($arr)-1]);
     $result['class'] = $class;
+
+    $bookNameCn = $html->find("h1.f20", 0);
+    if($bookNameCn){
+        $result['book_name_zh'] = trim($bookNameCn->plaintext);
+    }
+
+    $bookNameEn = $html->find("h1.f10", 0);
+    if($bookNameEn){
+        $result['book_name_en'] = $bookNameEn;
+    }
+
+    $isCore = $html->find("li.f12 img");//是否核心
+    if(count($isCore)>0){
+        $result['is_core'] = true;
+        //获取是那些核心
+        $code = getQkCode($u);
+        $coreUrl = "http://www.cqvip.com/journal/getdata.aspx?action=jra&gch=$code";
+        $cc = file_get_contents($coreUrl);
+        $cc = str_replace(",", "#", $cc);
+        $cc = trim($cc);
+        $result['he_xin'] = $cc;
+
+    }else $result['is_core'] = false;
+
+    $intro = $html->find("ul.jorintro li");
+    if(count($intro)==2){
+        $intro = $intro[1];
+        $txt = $intro->plaintext;
+        $arr = explode("：", $txt);
+        $result['jian_jie'] = trim($arr[1]);
+    }
+
+    $kvMap = array(
+        "主管单位"=>"zhu_guan_dan_wei",
+        "主办单位"=>"zhu_ban_dan_wei",
+        "主　　编"=>"zhu_bian",
+        "刊　　期"=>"kan_qi",
+        "开　　本"=>"kai_ben",
+        "创刊时间"=>"chuang_kan_shi_jian",
+        "邮发代号"=>"you_fa_dai_hao",
+        //"联系方式"=>"lian_xi_fang_shi",
+        "单　　价"=>"dan_jia",
+        "定　　价"=>"ding_jia",
+        "国内统一刊号"=>"cn",
+        "国际标准刊号"=>"issn",
+        "获奖情况"=>"huo_jiang",
+        "国外数据库收录"=>"guo_wai_shu_ju_ku_shou_lu",
+        "地　　址"=>"di_zhi",
+        "邮政编码"=>"you_bian",
+        "电　　话"=>"dian_hua",
+        "邮　　箱"=>"you_xiang",
+        "官方网站"=>"guan_fang_wang_zhan",
+
+    );
+    $qikanInfo = $html->find("ul.wow li");
+    if(count($qikanInfo)>0){
+        $tempInfo = array();
+        foreach($qikanInfo as $li){
+            $txt = trim($li->plaintext);
+            $arr = explode("：", $txt);
+            if(count($arr)==2){
+                $key = trim($arr[0]);
+                //$key = str_replace(" ", "", $key);
+                $val = trim($arr[1]);
+                $realkey = @$kvMap[$key];
+                if($realkey){
+                    $tempInfo[$realkey] = $val;
+                }
+
+                $result = array_merge($result, $tempInfo);
+            }
+            /*else if(count($arr)==1){
+                $a = $li->find("a");
+                if($a){
+                    $tmp = array();
+                    foreach($a as $href){
+                        $tmp[] = trim($href->plaintext);
+                    }
+                    $str = my_join("#", $tmp);
+                    $ss2 = @$result['shu_ju_ku'];
+                    if(strlen($ss2)>0){
+                        $ss2 = "$ss2#$str";
+                    }
+                    $result['shu_ju_ku'] = $ss2;
+                }
+            }*/
+            else{
+                echo "错误了，解析详细信息的时候\n";
+            }
+        }
+    }
+
+    $zhu_ban_dan_wei = @$result['zhu_ban_dan_wei'];
+    if($zhu_ban_dan_wei){
+        $zhu_ban_dan_wei = str_replace(" ", "#", $zhu_ban_dan_wei);
+        $result['zhu_ban_dan_wei'] = $zhu_ban_dan_wei;
+    }
+
+    $huo_jiang = @$result['huo_jiang'];
+    if($huo_jiang){
+        $huo_jiang = str_replace("；", "#", $huo_jiang);
+        $result['huo_jiang'] = $huo_jiang;
+    }
+
+    $guowai = @$result['guo_wai_shu_ju_ku_shou_lu'];
+    if($guowai){
+        $guowai = preg_replace("/\s+/", "#", $guowai);
+        $result['guo_wai_shu_ju_ku_shou_lu'] = $guowai;
+    }
+
+    //联系方式
+    $lianxi = $html->find("div#vipcontacttext ul.mdline li");
+    if($lianxi){
+        $array = array();
+        foreach($lianxi as $lx){
+            $txt = trim($lx->plaintext);
+            $arr = explode("：", $txt);
+            if(count($arr)==2){
+                $k = trim($arr[0]);
+                $v = trim($arr[1]);
+                $result[$kvMap[$k]] = $v;
+            }
+        }
+    }
+
+    $dianhua = @$result['dian_hua'];
+    if($dianhua){
+        $dianhua = str_replace(" ", "#", $dianhua);
+        $result['dian_hua'] = $dianhua;
+    }
+
+    $youxiang = @$result['you_xiang'];
+    if($youxiang){
+        $youxiang = str_replace(";", "#", $youxiang);
+        $result['you_xiang'] = $youxiang;
+    }
 
     $dom->clear();
 
@@ -141,6 +284,12 @@ $portal = array(
     "http://www.cqvip.com/Journal/69.shtml",
 );
 
+$u = "http://www.cqvip.com/qk/91994X/";
+$r = parseCqvipDetail($u);
+var_dump($r);
+exit;
+
+
 foreach($portal as $url){
     $detailUrl = getDetailUrl($url);
 
@@ -168,10 +317,10 @@ foreach($portal as $url){
     foreach($detailUrl as $url){
         $content = file_get1($url);
         if(strlen($content)>100){//至少不是空的
-            $result = parseCqvipDetail($content);
+            $result = parseCqvipDetail($u);
             getCover($content);
             saveUrl($result['class'] . "\t" . $url);
-            file_put_contents("./detail.log", my_json_encode($result)."\n", FILE_APPEND);
+            file_put_contents("./cqvip_detail.log", my_json_encode($result)."\n", FILE_APPEND);
         }
     }
 
