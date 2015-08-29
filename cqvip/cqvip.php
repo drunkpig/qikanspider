@@ -154,7 +154,13 @@ function parseCqvipDetail($u){
                 }
             }*/
             else{
-                echo "信息缺失：{$li->plaintext}\n";
+                $str = trim($li->plaintext);
+                if($str=="本刊MARC数据 本刊DC数据" || $str=="国家图书馆馆藏 上海图书馆馆藏"||strlen($str)==0){
+                    continue;
+                }
+                else{
+                    echo "信息缺失：{$li->plaintext}\n";
+                }
             }
         }
     }
