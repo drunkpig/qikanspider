@@ -154,7 +154,7 @@ function parseCqvipDetail($u){
                 }
             }*/
             else{
-                echo "错误了，解析详细信息的时候\n";
+                echo "信息缺失：{$li->plaintext}\n";
             }
         }
     }
