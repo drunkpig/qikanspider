@@ -120,6 +120,7 @@ def process_a_file(file):
                 log_key(redis_key)
             except UnicodeDecodeError as e:
                 print("unicode error %s", line, end="\n")
+                continue
 
 for key in file_list:
     val = file_list[key]
