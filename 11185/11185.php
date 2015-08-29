@@ -233,7 +233,7 @@ function parse11185DetailPage($url){
     else{
         file_put_contents("./error.log", "", FILE_APPEND);
     }
-
+    $result['_from'] = "11185";
     $dom->clear();
     return $result;
 }

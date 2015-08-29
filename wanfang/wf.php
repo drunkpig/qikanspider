@@ -112,7 +112,7 @@ function process($class, $content)
 function parseDetail($class, $url, $content){
 	echo "解析详情： $url\n";
 
-	$detailLog = "./detail.log";
+	$detailLog = "./wf_detail_temp.log";
 	
 	$result = array();
 	$result['url'] = $url;
@@ -341,6 +341,35 @@ function parseDetail($class, $url, $content){
 		 }
 	 }
 	 
-	
+	/**
+	 * 优先出版、是否核心
+	 */
+	$lines = file("./core.log");
+    $cores = explode("\n", $lines);
+    $lines2 = file("./prePub.log");
+    $prePub = explode("\n", $lines2);
+
+    $fp = fopen("./wf_detail_temp.log");
+    $line == "";
+    while(($line=fgets($fp))){
+        $line = trim($line);
+        if(strlen($line)>0){
+            $result = json_decode($line);
+            $book_name_zh = $result['book_name_zh'];
+            $book_name_en = $result['book_name_en'];
+            if(in_array($book_name_zh, $cores) || in_array($book_name_en, $cores)){
+                $result['is_core'] = "Y";
+            }
+            else $result['is_core'] = "N";
+
+            if(in_array($book_name_zh, $prePub) || in_array($book_name_en, $prePub)){
+                $result['is_prepub'] = "Y";
+            }
+            else $result['is_prepub'] = "N";
+        }
+        $result['_from'] = "wanfang";
+
+        file_put_contents("./wf_detail.log", my_json_encode($result), FILE_APPEND);
+    }
 	
 ?>

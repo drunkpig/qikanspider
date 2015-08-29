@@ -140,6 +140,7 @@ function parseDetail($bigClass, $subClass, $info)
 
 
         var_dump($result);
+        $result['_from'] = "cnki";
         saveDetail($result);
     }
 }

@@ -89,7 +89,7 @@ function parseDetailInfo($url){
     $result['lan_mu'] = str_replace("&nbsp;", "", $result['lan_mu']);
     $result['lan_mu'] = str_replace(" ", "#", $result['lan_mu']);
     $result['lan_mu'] = preg_replace("/\(.*?\)/", "", $result['lan_mu']);
-
+    $result['_from'] = "emuch_zh";
     return $result;
 }
 

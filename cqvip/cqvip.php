@@ -205,7 +205,7 @@ function parseCqvipDetail($u){
     }
 
     $dom->clear();
-
+    $result['_from'] = "cqvip";
     return $result;
 }
 
