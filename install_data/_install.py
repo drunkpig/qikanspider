@@ -1,7 +1,10 @@
+
+
 __author__ = 'cxu'
 import json
 import redis
-
+import hashlib
+import fileinput
 
 file_list = {
     "11185" : "../11185/11185_detail.log",
@@ -12,7 +15,24 @@ file_list = {
     "emuch_en" : "../emuch/emuch_detail_en.log"
     }
 
-all_keys = {} #  存放全部的由get_key生成的key,最后阶段利用这些key，从缓存中取出最终的数据
+all_keys = {}  #  存放全部的由get_key生成的key,最后阶段利用这些key，从缓存中取出最终的数据
+
+redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
+
+def get_format_book_name(book_name):
+    """
+    去除书名字里带括号的备注
+    :param book_name:
+    :return:
+    """
+    formated_bk_name = book_name
+    if book_name is not None:
+        i = book_name.find("(")
+        if i<=0:
+            i = book_name.find("（")
+        if i>0:
+            formated_bk_name = book_name[0:i].strip()
+    return formated_bk_name
 
 def get_key(book_zh, book_en):
     """
@@ -21,7 +41,9 @@ def get_key(book_zh, book_en):
     :param book_en:
     :return:
     """
-    pass
+    zh_key = get_format_book_name(book_zh)
+    en_key = get_format_book_name(book_en)
+    return hashlib.md5(zh_key + en_key)
 
 def merge(map1, map2):
     """
@@ -30,7 +52,14 @@ def merge(map1, map2):
     :param map2:
     :return:
     """
-    pass
+    result = map1.copy();
+    for key in map2:
+        val1_len = len(result[key])
+        val2_len = len(map2[key])
+        if(val2_len>val1_len):  #  取数据量大的
+            result[key] = map2[key]
+
+    return result
 
 def get_cache(key):
     """
@@ -38,7 +67,12 @@ def get_cache(key):
     :param key:
     :return:
     """
-    pass
+    map = None
+    json_str = redis_client.get(key)
+    if json_str is not None:
+        map = json.load(json_str)
+
+    return map;
 
 def put_cache(key, map):
     """
@@ -48,8 +82,11 @@ def put_cache(key, map):
     """
     all_keys[key] = 1;
     json_map = json.dumps(map)
-    r = redis.StrictRedis(host='localhost', port=6379, db=0)
-    r.set(key, json_map)
+    redis_client.set(key, json_map)
+
+def log_key(key):
+    with open("./keys.log", "w+") as f:
+        f.write(key+"\n");
 
 def process_a_file(file):
     """
@@ -57,8 +94,20 @@ def process_a_file(file):
     :param file:
     :return:
     """
+    with fileinput.input(file) as f:
+        for line in f:
+            map = json.loads(line)
+            book_zh = map['book_name_zh']
+            book_en = map['book_name_en']
+            redis_key = get_key(book_zh, book_en)
+            map2 = get_cache(redis_key)
+            if map2 is not None:
+                allmap = merge(map, map2)
+                put_cache(redis_key, allmap)
+            else:
+                put_cache(redis_key, map)
 
-    pass
+            log_key(redis_key)
 
 
 for key in file_list:
@@ -66,3 +115,7 @@ for key in file_list:
     print("begin to process file : %s => %s" % (key, val), end="\n")
     process_a_file(val)
     print("end process file %s", (val), end="\n");
+
+if __name__ == "__main__":
+    print(get_format_book_name("中国人 |(china people)"), end="\n")
+    print(get_format_book_name("国外 |（foreign）"), end="\n")
