@@ -328,7 +328,7 @@ function img_get_file($imgUrl){
 
     if(!file_exists($imgFile)){
 		if(strlen(trim($imgFile))>0){
-			$imgContent = file_get_contents($imgUrl);
+			$imgContent = @file_get_contents($imgUrl);
 		}else $imgContent = "";
 
 
