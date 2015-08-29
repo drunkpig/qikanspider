@@ -52,10 +52,10 @@ function parseCqvipDetail($u){
         $tex = str_replace("&gt;", ">", $tex);
         $arr = explode(">", $tex);
         $class  = "";
-        for($i=2; $i<count($arr)-1; $i++){
+        for($i=2; $i<count($arr)-2; $i++){
             $class .= trim($arr[$i])."#";
         }
-        $class .= trim($arr[count($arr)-1]);
+        $class .= trim($arr[count($arr)-2]);
         $result['class'] = $class;
     }
     else{
