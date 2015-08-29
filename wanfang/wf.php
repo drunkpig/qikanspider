@@ -359,7 +359,7 @@ function parseDetail($class, $url, $content){
 	/**
 	 * 优先出版、是否核心
 	 */
-	$lines = file("./core.log");
+	$lines = file_get_contents("./core.log");
     $cores = explode("\n", $lines);
     $lines2 = file("./prePub.log");
     $prePub = explode("\n", $lines2);
