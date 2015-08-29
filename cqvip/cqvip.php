@@ -80,7 +80,7 @@ function parseCqvipDetail($u){
 
     $isCore = $html->find("li.f12 img");//是否核心
     if(count($isCore)>0){
-        $result['is_core'] = true;
+        $result['is_core'] = "Y";
         //获取是那些核心
         $code = getQkCode($u);
         $coreUrl = "http://www.cqvip.com/journal/getdata.aspx?action=jra&gch=$code";
@@ -89,7 +89,7 @@ function parseCqvipDetail($u){
         $cc = trim($cc);
         $result['he_xin'] = $cc;
 
-    }else $result['is_core'] = false;
+    }else $result['is_core'] = "N";
 
     $intro = $html->find("ul.jorintro li");
     if(count($intro)==2){
@@ -216,7 +216,7 @@ function getCover($content){
     if(count($img)>0){
         $img = $img[0];
         $src = $img->src;
-        img_get_file($src);
+        return img_get_file($src);
     }
     else{
         echo "没有发现封皮\n";
@@ -295,7 +295,7 @@ $portal = array(
     "http://www.cqvip.com/Journal/69.shtml",
 );
 
-//$u = "http://www.cqvip.com/qk/91994X/";
+//$u = "http://www.cqvip.com/qk/95190X/";
 //$r = parseCqvipDetail($u);
 //var_dump($r);
 //exit;
@@ -326,14 +326,16 @@ foreach($portal as $url){
 
     /*抓全部的url*/
     foreach($detailUrl as $url){
+        $result = array();
         $content = file_get1($url);
         if(strlen($content)>100){//至少不是空的
-            $result = parseCqvipDetail($u);
+            $result = parseCqvipDetail($url);
             if(count($result)<=0){
                 echo "抓到没有数据页面 $url\n";
                 continue;
             }
-            getCover($content);
+            $img = getCover($content);
+            $result['image'] = $img;
             saveUrl($result['class'] . "\t" . $url);
             file_put_contents("./cqvip_detail.log", my_json_encode($result)."\n", FILE_APPEND);
         }
