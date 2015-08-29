@@ -32,6 +32,8 @@ def get_format_book_name(book_name):
             i = book_name.find("（")
         if i>0:
             formated_bk_name = book_name[0:i].strip()
+    else:
+        formated_bk_name = "";
     return formated_bk_name
 
 def get_key(book_zh, book_en):
