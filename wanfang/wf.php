@@ -373,14 +373,14 @@ function parseDetail($class, $url, $content){
             $book_name_zh = $result['book_name_zh'];
             $book_name_en = $result['book_name_en'];
             if(in_array($book_name_zh, $cores) || in_array($book_name_en, $cores)){
-                $result['is_core'] = "Y";
+                $result['is_he_xin'] = "Y";
             }
-            else $result['is_core'] = "N";
+            else $result['is_he_xin'] = "N";
 
             if(in_array($book_name_zh, $prePub) || in_array($book_name_en, $prePub)){
-                $result['is_prepub'] = "Y";
+                $result['is_you_xian_chu_ban'] = "Y";
             }
-            else $result['is_prepub'] = "N";
+            else $result['is_you_xian_chu_ban'] = "N";
         }
         $result['_from'] = "wanfang";
 
