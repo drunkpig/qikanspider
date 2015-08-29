@@ -102,20 +102,22 @@ def process_a_file(file):
     """
     with fileinput.input(file) as f:
         for line in f:
-            map = json.loads(line)
-            print(str(map))
-            book_zh = map.get('book_name_zh')
-            book_en = map.get('book_name_en')
-            redis_key = get_key(book_zh, book_en)
-            map2 = get_cache(redis_key)
-            if map2 is not None:
-                allmap = merge(map, map2)
-                put_cache(redis_key, allmap)
-            else:
-                put_cache(redis_key, map)
+            try:
+                map = json.loads(line)
+                print(str(map))
+                book_zh = map.get('book_name_zh')
+                book_en = map.get('book_name_en')
+                redis_key = get_key(book_zh, book_en)
+                map2 = get_cache(redis_key)
+                if map2 is not None:
+                    allmap = merge(map, map2)
+                    put_cache(redis_key, allmap)
+                else:
+                    put_cache(redis_key, map)
 
-            log_key(redis_key)
-
+                log_key(redis_key)
+            except UnicodeDecodeError as e:
+                print("unicode error %s", line, end="\n")
 
 for key in file_list:
     val = file_list[key]
