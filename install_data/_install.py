@@ -44,7 +44,8 @@ def get_key(book_zh, book_en):
     zh_key = get_format_book_name(book_zh)
     en_key = get_format_book_name(book_en)
     key = zh_key + en_key
-    return hashlib.md5(key.encode("utf-8"))
+    return hashlib.md5(key.encode("utf-8")).hexdigest()
+
 
 def merge(map1, map2):
     """
@@ -87,8 +88,7 @@ def put_cache(key, map):
 
 def log_key(key):
     with open("./keys.log", "w+") as f:
-        f.write(key);
-        f.write("\n")
+        f.write(key+"\n")
 
 def process_a_file(file):
     """
