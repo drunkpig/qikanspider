@@ -364,7 +364,7 @@ function parseDetail($class, $url, $content){
     $lines2 = file("./prePub.log");
     $prePub = explode("\n", $lines2);
 
-    $fp = fopen("./wf_detail_temp.log");
+    $fp = fopen("./wf_detail_temp.log", "r+");
     $line == "";
     while(($line=fgets($fp))){
         $line = trim($line);
