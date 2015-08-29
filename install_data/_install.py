@@ -87,7 +87,8 @@ def put_cache(key, map):
 
 def log_key(key):
     with open("./keys.log", "w+") as f:
-        f.write(key+"\n");
+        f.write(key);
+        f.write("\n")
 
 def process_a_file(file):
     """
