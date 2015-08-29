@@ -109,6 +109,21 @@ function process($class, $content)
 	$dom->clear();
 }
 
+/**
+ * 除去书名字
+ * @param $class
+ */
+function _get_class($class){
+	$arr = explode("#", $class);
+	$len = count($arr);
+	$arr2 = array();
+	for($i=0; $i<$len-1; $i++){
+		array_push($arr2, $arr[$i]);
+	}
+
+	return my_join("#", $arr2);
+}
+
 function parseDetail($class, $url, $content){
 	echo "解析详情： $url\n";
 
@@ -116,7 +131,7 @@ function parseDetail($class, $url, $content){
 	
 	$result = array();
 	$result['url'] = $url;
-	$result['class'] = $class;
+	$result['class'] = _get_class($class);
 	
 	$dom = new simple_html_dom();
 	$html = $dom->load($content);
