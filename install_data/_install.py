@@ -78,6 +78,7 @@ def get_cache(key):
     map = None
     json_str = redis_client.get(key)
     if json_str is not None:
+        json_str = json_str.decode("utf-8")
         map = json.load(json_str)
 
     return map;
@@ -103,9 +104,9 @@ def process_a_file(file):
     :return:
     """
     with fileinput.input(file) as f:
-        for line in f:
-
-            try:
+        f = open(file, error="ignore")
+        try:
+            for line in f:
                 map = json.loads(line)
                 print(str(map))
                 book_zh = map.get('book_name_zh')
@@ -119,9 +120,8 @@ def process_a_file(file):
                     put_cache(redis_key, map)
 
                 log_key(redis_key)
-            except UnicodeDecodeError as e:
-                print("unicode error %s", line, end="\n")
-                continue
+        except UnicodeDecodeError as e:
+            print("unicode error %s", line, end="\n")
 
 for key in file_list:
     val = file_list[key]
