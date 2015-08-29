@@ -33,4 +33,4 @@ while(($line=fgets($fp))){
     }
 }
 
-echo my_join(",", $fields)."\n";
+echo my_join("\n", $fields)."\n";

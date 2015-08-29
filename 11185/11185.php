@@ -118,7 +118,7 @@ function parse11185DetailPage($url){
         $src = "http://bk.11185.cn/" . $node->src;
         echo "$src\n";
         $imgFile = img_get_file($src);
-        $result['fengmian'] = $imgFile;
+        $result['feng_mian'] = $imgFile;
     }
     else{
         echo "没有找到图片\n";
@@ -135,7 +135,7 @@ function parse11185DetailPage($url){
         "邮发编号"=>"you_fa_bian_hao",
         "发行年份"=>"fa_xing_nian_fen",
         "报刊种类"=>"bao_kan_zhong_lei",
-        "期刊类别"=>"bao_kan_lei_bie",
+        "期刊类别"=>"chu_ban_zhou_qi",
         "出版日期"=>"chu_ban_ri_qi",
 
     );
@@ -222,13 +222,13 @@ function parse11185DetailPage($url){
     if($len==2){
         $nd = $node[0];
         $jianjie = trim($nd->plaintext);
-        $result['jianjie'] = $jianjie;
+        $result['jian_jie'] = $jianjie;
 
         $nd = $node[1];
         $lanmu = trim($nd->plaintext);
         $arr = explode("\n", $lanmu);
         $lanmu = my_join("#", $arr);
-        $result['lanmu'] = $lanmu;
+        $result['lan_mu'] = $lanmu;
     }
     else{
         file_put_contents("./error.log", "", FILE_APPEND);

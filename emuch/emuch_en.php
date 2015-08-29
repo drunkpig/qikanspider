@@ -9,8 +9,8 @@ $keyMap = array(
     "出版周期"=>"chu_ban_zhou_qi",
     "出版ISSN"=>"issn",
     "通讯方式"=>"chu_ban_di",
-    "期刊主页网址"=>"site",
-    "在线投稿网址"=>"tou_gao_site",
+    "期刊主页网址"=>"guan_fang_wang_zhan",
+    "在线投稿网址"=>"tou_gao_wang_zhan",
     "其他相关链接"=>"xiang_guan_lian_jie",
 
     "偏重的研究方向"=>"lan_mu",

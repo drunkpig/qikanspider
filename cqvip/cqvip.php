@@ -80,16 +80,16 @@ function parseCqvipDetail($u){
 
     $isCore = $html->find("li.f12 img");//是否核心
     if(count($isCore)>0){
-        $result['is_core'] = "Y";
+        $result['is_he_xin'] = "Y";
         //获取是那些核心
         $code = getQkCode($u);
         $coreUrl = "http://www.cqvip.com/journal/getdata.aspx?action=jra&gch=$code";
         $cc = file_get_contents($coreUrl);
         $cc = str_replace(",", "#", $cc);
         $cc = trim($cc);
-        $result['he_xin'] = $cc;
+        $result['he_xin_lie_biao'] = $cc;
 
-    }else $result['is_core'] = "N";
+    }else $result['is_he_xin'] = "N";
 
     $intro = $html->find("ul.jorintro li");
     if(count($intro)==2){
@@ -103,7 +103,7 @@ function parseCqvipDetail($u){
         "主管单位"=>"zhu_guan_dan_wei",
         "主办单位"=>"zhu_ban_dan_wei",
         "主　　编"=>"zhu_bian",
-        "刊　　期"=>"kan_qi",
+        "刊　　期"=>"chu_ban_zhou_qi",
         "开　　本"=>"kai_ben",
         "创刊时间"=>"chuang_kan_shi_jian",
         "邮发代号"=>"you_fa_dai_hao",
@@ -116,7 +116,7 @@ function parseCqvipDetail($u){
         "变更情况"=>"bian_geng",
         "国外数据库收录"=>"guo_wai_shu_ju_ku_shou_lu",
         "地　　址"=>"di_zhi",
-        "邮政编码"=>"you_bian",
+        "邮政编码"=>"you_zheng_bian_ma",
         "电　　话"=>"dian_hua",
         "邮　　箱"=>"you_xiang",
         "官方网站"=>"guan_fang_wang_zhan",
@@ -335,7 +335,7 @@ foreach($portal as $url){
                 continue;
             }
             $img = getCover($content);
-            $result['image'] = $img;
+            $result['feng_mian'] = $img;
             saveUrl($result['class'] . "\t" . $url);
             file_put_contents("./cqvip_detail.log", my_json_encode($result)."\n", FILE_APPEND);
         }

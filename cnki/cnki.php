@@ -8,12 +8,12 @@ function saveDetail($info){
 function parseDetail($bigClass, $subClass, $info)
 {
     $kvMap = array(
-        "主办"=>"zhu_ban",
-        "周期"=>"zhou_qi",
+        "主办"=>"zhu_ban_dan_wei",
+        "周期"=>"chu_ban_zhou_qi",
         "出版地"=>"chu_ban_di",
         "语种"=>"yu_zhong",
         "开本"=>"kai_ben",
-        "ISSN"=>"issb",
+        "ISSN"=>"issn",
         "CN"=>"cn",
         "邮发代号"=>"you_fa_dai_hao",
         "复合影响因子"=>"fu_he_ying_xiang_yin_zi",
@@ -21,7 +21,7 @@ function parseDetail($bigClass, $subClass, $info)
         "现用刊名"=>"xian_yong_kan_ming",
         "曾用刊名"=>"ceng_yong_kan_ming",
         "创刊时间"=>"chuang_kan_shi_jian",
-        "该刊被以下数据库收录"=>"shu_ju_ku",
+        "该刊被以下数据库收录"=>"shu_ju_ku_shou_lu",
         "核心期刊"=>"he_xin_list",
         "期刊荣誉"=>"huo_jiang",
         "刊名"=>"book_name_zh",
@@ -42,7 +42,7 @@ function parseDetail($bigClass, $subClass, $info)
             $imgSrc = $fengmian->src;
             $imgSrc = substr($imgSrc, strlen("/fengmian/"));
             $src = "http://c61.cnki.net/" . $imgSrc;
-            $result['fengmian'] = img_get_file($src);
+            $result['feng_mian'] = img_get_file($src);
         }
         $isDuJia = $dom->find("div.duJia");
         if(count($isDuJia)>0){

@@ -125,7 +125,7 @@ function parseDetail($class, $url, $content){
 	$node = $dom->find("img#periodicalImage");
 	$node = $node[0];
 	$imgUrl = $node->src;
-	$result['image_little'] = img_get_file($imgUrl);
+	$result['feng_mian'] = img_get_file($imgUrl);
 
 	echo "[1]封面->";
 	//2,中文名称
@@ -147,7 +147,7 @@ function parseDetail($class, $url, $content){
 	if(count($node)>0){
 		$node = $node[0];
 		$jianjie = $node->plaintext;
-		$result['qikan_jianjie'] = trim($jianjie);
+		$result['jian_jie'] = trim($jianjie);
 	}
 	echo "[4]期刊简介->曾用名->";
     //+曾用名
@@ -162,7 +162,7 @@ function parseDetail($class, $url, $content){
                 $hasCengYongMing = 1;
             }
             $val = trim($node[1]->plaintext);
-            $result['ceng_yong_ming'] = $val;
+            $result['ceng_yong_kan_ming'] = $val;
 
         }
     }
@@ -181,7 +181,7 @@ function parseDetail($class, $url, $content){
 			$lanmuArr[] = $lm;
 		}
 		$lanmu = my_join("#", $lanmuArr);
-		$result['qikan_lanmu'] = $lanmu;
+		$result['lan_mu'] = $lanmu;
 	}
 	echo "[5]主要栏目->";
 
@@ -220,13 +220,13 @@ function parseDetail($class, $url, $content){
                 "地址" => "di_zhi",
                 "邮政编码" => "you_zheng_bian_ma",
                 "电话" => "dian_hua",
-                "Email" => "email",
-                "网址" => "site",
+                "Email" => "you_xiang",
+                "网址" => "guan_fang_wang_zhan",
             );
 
             $info = array_key_replace($kvMap, $info);
-            $info["email"] = strtolower($info["email"]);
-            $info["site"] = strtolower($info["site"]);
+            $info["you_xiang"] = strtolower($info["you_xiang"]);
+            $info["guan_fang_wang_zhan"] = strtolower($info["guan_fang_wang_zhan"]);
             $info['zhu_ban_dan_wei'] = str_replace("  ", "#", $info['zhu_ban_dan_wei']);
             $info['dian_hua'] = str_replace(" ", "#", $info['dian_hua']);
             $result = array_merge($info, $result);
