@@ -107,7 +107,7 @@ def process_a_file(file):
         f = open(file, errors="ignore")
         try:
             for line in f:
-                map = json.loads(line)
+                map = json.loads(line, encoding="utf-8")
                 #  print(str(map))
                 book_zh = map.get('book_name_zh')
                 book_en = map.get('book_name_en')
