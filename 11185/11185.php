@@ -118,7 +118,7 @@ function parse11185DetailPage($url){
         $src = "http://bk.11185.cn/" . $node->src;
         echo "$src\n";
         $imgFile = img_get_file($src);
-        $result['image_big'] = $imgFile;
+        $result['fengmian'] = $imgFile;
     }
     else{
         echo "没有找到图片\n";
@@ -131,7 +131,7 @@ function parse11185DetailPage($url){
         "全年价"=>"quan_nian_jia",
         "出版社"=>"chu_ban_she",
         "发报刊局"=>"fa_bao_kan_ju",
-        "国内标准刊号"=>"guo_nei_biao_zhun_kan_hao",
+        "国内标准刊号"=>"cn",
         "邮发编号"=>"you_fa_bian_hao",
         "发行年份"=>"fa_xing_nian_fen",
         "报刊种类"=>"bao_kan_zhong_lei",
@@ -234,6 +234,11 @@ function parse11185DetailPage($url){
         file_put_contents("./error.log", "", FILE_APPEND);
     }
     $result['_from'] = "11185";
+    $bao_kan_zhong_lei = $result['bao_kan_zhong_lei'];
+    if(strlen($bao_kan_zhong_lei)>0){
+        $result['class'] = "$bao_kan_zhong_lei#".$result['class'];
+        unset($result['bao_kan_zhong_lei']);
+    }
     $dom->clear();
     return $result;
 }
