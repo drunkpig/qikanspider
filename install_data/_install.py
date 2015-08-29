@@ -79,7 +79,7 @@ def get_cache(key):
     json_str = redis_client.get(key)
     if json_str is not None:
         json_str = json_str.decode("utf-8")
-        map = json.load(json_str)
+        map = json.load(json_str, encoding="utf-8")
 
     return map;
 
