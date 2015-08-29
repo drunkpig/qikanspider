@@ -56,9 +56,13 @@ def merge(map1, map2):
     """
     result = map1.copy();
     for key in map2:
-        val1_len = len(result[key])
+        val1_len = 0
+        val1 = result.get(key)
+        if val1 is not None:
+            val1_len = len(val1)
+
         val2_len = len(map2[key])
-        if(val2_len>val1_len):  #  取数据量大的
+        if val2_len>val1_len:  #  取数据量大的
             result[key] = map2[key]
 
     return result
@@ -100,8 +104,8 @@ def process_a_file(file):
         for line in f:
             map = json.loads(line)
             print(str(map))
-            book_zh = map['book_name_zh']
-            book_en = map['book_name_en']
+            book_zh = map.get('book_name_zh')
+            book_en = map.get('book_name_en')
             redis_key = get_key(book_zh, book_en)
             map2 = get_cache(redis_key)
             if map2 is not None:
