@@ -119,3 +119,4 @@ for key in file_list:
 if __name__ == "__main__":
     print(get_format_book_name("中国人 |(china people)"), end="\n")
     print(get_format_book_name("国外 |（foreign）"), end="\n")
+
