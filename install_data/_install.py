@@ -43,7 +43,7 @@ def get_key(book_zh, book_en):
     """
     zh_key = get_format_book_name(book_zh)
     en_key = get_format_book_name(book_en)
-    return hashlib.md5(zh_key + en_key)
+    return hashlib.md5(zh_key.encode("utf-8") + en_key.encode("utf-8"))
 
 def merge(map1, map2):
     """
