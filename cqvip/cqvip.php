@@ -113,6 +113,7 @@ function parseCqvipDetail($u){
         "国内统一刊号"=>"cn",
         "国际标准刊号"=>"issn",
         "获奖情况"=>"huo_jiang",
+        "变更情况"=>"bian_geng",
         "国外数据库收录"=>"guo_wai_shu_ju_ku_shou_lu",
         "地　　址"=>"di_zhi",
         "邮政编码"=>"you_bian",
@@ -127,6 +128,7 @@ function parseCqvipDetail($u){
         foreach($qikanInfo as $li){
             $txt = trim($li->plaintext);
             $arr = explode("：", $txt);
+
             if(count($arr)==2){
                 $key = trim($arr[0]);
                 //$key = str_replace(" ", "", $key);
@@ -138,21 +140,13 @@ function parseCqvipDetail($u){
 
                 $result = array_merge($result, $tempInfo);
             }
-            /*else if(count($arr)==1){
-                $a = $li->find("a");
-                if($a){
-                    $tmp = array();
-                    foreach($a as $href){
-                        $tmp[] = trim($href->plaintext);
-                    }
-                    $str = my_join("#", $tmp);
-                    $ss2 = @$result['shu_ju_ku'];
-                    if(strlen($ss2)>0){
-                        $ss2 = "$ss2#$str";
-                    }
-                    $result['shu_ju_ku'] = $ss2;
-                }
-            }*/
+            else if(count($arr)>2){
+                $key = substr($txt, 0, strpos($txt, "："));
+                $key = trim($key);
+                $val = substr($txt, strpos($txt, "：")+1);
+                $val = trim($val);
+                $result[$kvMap[$key]] = $val;
+            }
             else{
                 $str = trim($li->plaintext);
                 if($str=="本刊MARC数据 本刊DC数据" || $str=="国家图书馆馆藏 上海图书馆馆藏"||strlen($str)==0){
