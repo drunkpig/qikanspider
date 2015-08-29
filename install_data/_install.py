@@ -99,6 +99,7 @@ def process_a_file(file):
     with fileinput.input(file) as f:
         for line in f:
             map = json.loads(line)
+            print(str(map))
             book_zh = map['book_name_zh']
             book_en = map['book_name_en']
             redis_key = get_key(book_zh, book_en)
