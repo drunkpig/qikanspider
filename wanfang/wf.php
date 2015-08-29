@@ -361,7 +361,7 @@ function parseDetail($class, $url, $content){
 	 */
 	$lines = file_get_contents("./core.log");
     $cores = explode("\n", $lines);
-    $lines2 = file("./prePub.log");
+    $lines2 = file_get_contents("./prePub.log");
     $prePub = explode("\n", $lines2);
 
     $fp = fopen("./wf_detail_temp.log", "r+");
