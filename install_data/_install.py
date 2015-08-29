@@ -104,6 +104,7 @@ def process_a_file(file):
     """
     with fileinput.input(file) as f:
         for line in f:
+
             try:
                 map = json.loads(line)
                 print(str(map))

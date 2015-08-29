@@ -365,26 +365,28 @@ function parseDetail($class, $url, $content){
     $prePub = explode("\n", $lines2);
 
     $fp = fopen("./wf_detail_temp.log", "r+");
-    $line == "";
+    $line = "";
     while(($line=fgets($fp))){
         $line = trim($line);
         if(strlen($line)>0){
-            $result = json_decode($line);
+            $result = json_decode($line, true);
             $book_name_zh = $result['book_name_zh'];
             $book_name_en = $result['book_name_en'];
             if(in_array($book_name_zh, $cores) || in_array($book_name_en, $cores)){
                 $result['is_he_xin'] = "Y";
             }
-            else $result['is_he_xin'] = "N";
+            else $result['is_he_xin']  = "N";
 
             if(in_array($book_name_zh, $prePub) || in_array($book_name_en, $prePub)){
                 $result['is_you_xian_chu_ban'] = "Y";
             }
             else $result['is_you_xian_chu_ban'] = "N";
-        }
-        $result['_from'] = "wanfang";
+			
+			$result['_from'] = "wanfang";
 
-        file_put_contents("./wf_detail.log", my_json_encode($result), FILE_APPEND);
+			file_put_contents("./wf_detail.log", my_json_encode($result)."\n", FILE_APPEND);
+        }
+        
     }
 	
 ?>
