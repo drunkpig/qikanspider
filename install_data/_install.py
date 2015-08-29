@@ -104,7 +104,7 @@ def process_a_file(file):
     :return:
     """
     with fileinput.input(file) as f:
-        f = open(file, error="ignore")
+        f = open(file, errors="ignore")
         try:
             for line in f:
                 map = json.loads(line)
