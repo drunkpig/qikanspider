@@ -79,7 +79,7 @@ def get_cache(key):
     json_str = redis_client.get(key)
     if json_str is not None:
         json_str = json_str.decode("utf-8")
-        map = json.load(json_str, encoding="utf-8")
+        map = json.loads(json_str)
 
     return map;
 
@@ -108,7 +108,7 @@ def process_a_file(file):
         try:
             for line in f:
                 map = json.loads(line)
-                print(str(map))
+                #  print(str(map))
                 book_zh = map.get('book_name_zh')
                 book_en = map.get('book_name_en')
                 redis_key = get_key(book_zh, book_en)
