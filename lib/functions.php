@@ -262,7 +262,7 @@ function get_a_class_of_qikan($class, $startUrl)
 }
 
 function my_json_encode(array $data) {
-        $s= array();
+        /*$s= array();
         foreach($data as $k => $v) {
             if(is_array($v)) {
                 $v = my_json_encode($v);
@@ -272,8 +272,9 @@ function my_json_encode(array $data) {
                 $s[] = "\"$k\": \"$v\"";
             }
         }
-        return '{'.implode(', ', $s).'}';
-    }
+        return '{'.implode(', ', $s).'}';*/
+	return json_encode($data, JSON_UNESCAPED_UNICODE);
+}
 
 function file_get1($filePath)
 {
