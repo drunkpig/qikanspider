@@ -107,11 +107,15 @@ def process_a_file(file):
         f = open(file, errors="ignore")
         try:
             for line in f:
+                if len(line)<=0:
+                    continue
                 try:
                     map = json.loads(line, encoding="utf-8")
                     #  print(str(map))
                     book_zh = map.get('book_name_zh')
                     book_en = map.get('book_name_en')
+                    if book_zh is None and book_en is None:
+                        continue
                     redis_key = get_key(book_zh, book_en)
                     map2 = get_cache(redis_key)
                     if map2 is not None:
@@ -122,7 +126,7 @@ def process_a_file(file):
 
                     log_key(redis_key)
                 except ValueError as ve:
-                    print("value error %s\n", line)
+                    print("value error %s, %s\n", (line, ve))
         except UnicodeDecodeError as e:
             print("unicode error %s", line, end="\n")
 
