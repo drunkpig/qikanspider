@@ -63,9 +63,13 @@ def merge(map1, map2):
         if val1 is not None:
             val1_len = len(val1)
 
-        val2_len = len(map2[key])
+        val2 = map2.get(key)
+        val2_len = 0;
+        if val2 is not None:
+            val2_len = len(val2)
+
         if val2_len>val1_len:  #  取数据量大的
-            result[key] = map2[key]
+            result[key] = map2.get(key)
 
     return result
 
