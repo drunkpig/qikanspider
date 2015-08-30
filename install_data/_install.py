@@ -111,6 +111,9 @@ def process_a_file(file):
         f = open(file, errors="ignore")
         try:
             for line in f:
+                if line is None:
+                    continue
+                line = line.strip()
                 if len(line)<=0:
                     continue
                 try:
@@ -144,7 +147,7 @@ for key in file_list:
 
 for key in all_keys:
     print(key, end="\n")
-    
+
 if __name__ == "__main__":
     print(get_format_book_name("中国人 |(china people)"), end="\n")
     print(get_format_book_name("国外 |（foreign）"), end="\n")
