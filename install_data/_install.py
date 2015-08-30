@@ -114,6 +114,7 @@ def process_a_file(file):
                 if len(line)<=0:
                     continue
                 try:
+                    line = line.strip()
                     map = json.loads(line, encoding="utf-8")
                     #  print(str(map))
                     book_zh = map.get('book_name_zh')
