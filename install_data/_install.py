@@ -134,7 +134,6 @@ def process_a_file(file):
 
                     log_key(redis_key)
                 except ValueError as ve:
-                    print(line, end="\n")
                     print("value error %s, %s\n", (line, ve))
         except UnicodeDecodeError as e:
             print("unicode error %s", line, end="\n")
@@ -146,7 +145,10 @@ for key in file_list:
     print("end process file %s", (val), end="\n");
 
 for key in all_keys:
-    print(key, end="\n")
+    val = redis_client.get(key)
+    if val is not None:
+        string = val.decode("utf-8")
+        print(string, end="\n")
 
 if __name__ == "__main__":
     print(get_format_book_name("中国人 |(china people)"), end="\n")
