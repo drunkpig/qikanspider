@@ -131,6 +131,7 @@ def process_a_file(file):
 
                     log_key(redis_key)
                 except ValueError as ve:
+                    print(line, end="\n")
                     print("value error %s, %s\n", (line, ve))
         except UnicodeDecodeError as e:
             print("unicode error %s", line, end="\n")
@@ -141,6 +142,9 @@ for key in file_list:
     process_a_file(val)
     print("end process file %s", (val), end="\n");
 
+for key in all_keys:
+    print(key, end="\n")
+    
 if __name__ == "__main__":
     print(get_format_book_name("中国人 |(china people)"), end="\n")
     print(get_format_book_name("国外 |（foreign）"), end="\n")
