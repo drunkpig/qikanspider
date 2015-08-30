@@ -144,7 +144,9 @@ for key in file_list:
     process_a_file(val)
     print("end process file %s", (val), end="\n");
 
+# 把redis里去重之后的结果放入到文件里
 f = open("./temp", "w")
+print("保存去重之后的内容到文件\n")
 for key in all_keys:
     val = redis_client.get(key)
     if val is not None:
@@ -154,7 +156,7 @@ for key in all_keys:
         f.write(string)
         f.write("\n")
 
-if __name__ == "__main__":
-    print(get_format_book_name("中国人 |(china people)"), end="\n")
-    print(get_format_book_name("国外 |（foreign）"), end="\n")
+print("保存文件成功，准备写入mongodb\n")
+#  TODO 把temp文件里的内容写入到mongodb里
+
 
