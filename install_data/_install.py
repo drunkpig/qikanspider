@@ -144,13 +144,15 @@ for key in file_list:
     process_a_file(val)
     print("end process file %s", (val), end="\n");
 
+f = open("./temp", "w")
 for key in all_keys:
     val = redis_client.get(key)
     if val is not None:
         string = val.decode("utf-8")
         string = json.loads(string, encoding="utf-8")
         string = json.dumps(string, ensure_ascii=False)
-        print(string, end="\n")
+        f.write(string)
+        f.write("\n")
 
 if __name__ == "__main__":
     print(get_format_book_name("中国人 |(china people)"), end="\n")
