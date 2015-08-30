@@ -148,6 +148,8 @@ for key in all_keys:
     val = redis_client.get(key)
     if val is not None:
         string = val.decode("utf-8")
+        string = json.load(string)
+        string = json.dumps(string, ensure_ascii=False)
         print(string, end="\n")
 
 if __name__ == "__main__":
