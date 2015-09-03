@@ -164,6 +164,7 @@ print("保存文件成功，准备写入mongodb\n")
 #  TODO 把temp文件里的内容写入到mongodb里
 db = MongoClient(host="localhost", port=27017).db_qikan
 collection = db.qikan_info
+count = 0;
 
 with fileinput.input("./temp") as final_result_file:
     for line in final_result_file:
@@ -172,3 +173,7 @@ with fileinput.input("./temp") as final_result_file:
         #  print(string, end="\n")
         string['gmt_create'] = datetime.now()
         collection.insert_one(string)
+        count+=1
+
+print("保存mongodb成功, 一共有%d条数据", (count), end="\n")
+
