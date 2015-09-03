@@ -45,6 +45,8 @@ def get_key(book_zh, book_en):
     """
     zh_key = get_format_book_name(book_zh)
     en_key = get_format_book_name(book_en)
+    zh_key = zh_key.lower()
+    en_key = en_key.lower()
     key = zh_key + en_key
     return hashlib.md5(key.encode("utf-8")).hexdigest()
 
