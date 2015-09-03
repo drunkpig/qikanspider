@@ -170,5 +170,5 @@ with fileinput.input("./temp") as final_result_file:
         string = line.strip()
         string = json.loads(string, encoding="utf-8")
         #  print(string, end="\n")
-        string['ts'] = datetime().now()
+        string['gmt_create'] = datetime.now()
         collection.insert_one(string)
