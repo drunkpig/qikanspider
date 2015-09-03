@@ -5,6 +5,8 @@ import json
 import redis
 import hashlib
 import fileinput
+from pymongo import MongoClient
+import datetime.datetime
 
 file_list = {
     "11185" : "../11185/11185_detail.log",
@@ -160,9 +162,13 @@ for key in all_keys:
 
 print("保存文件成功，准备写入mongodb\n")
 #  TODO 把temp文件里的内容写入到mongodb里
+db = MongoClient(host="localhost", port=27017).db_qikan
+collection = db.qikan_info
 
 with fileinput.input("./temp") as final_result_file:
     for line in final_result_file:
         string = line.strip()
         string = json.loads(string, encoding="utf-8")
-        print(string, end="\n")
+        #  print(string, end="\n")
+        string['ts'] = datetime().now()
+        collection.insert_one(string)
