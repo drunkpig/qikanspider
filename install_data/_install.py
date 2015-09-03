@@ -159,4 +159,8 @@ for key in all_keys:
 print("保存文件成功，准备写入mongodb\n")
 #  TODO 把temp文件里的内容写入到mongodb里
 
-
+with fileinput.input("./temp") as final_result_file:
+    for line in final_result_file:
+        string = line.strip()
+        string = json.loads(string, encoding="utf-8")
+        print(string, end="\n")
