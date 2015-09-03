@@ -6,7 +6,7 @@ import redis
 import hashlib
 import fileinput
 from pymongo import MongoClient
-import datetime.datetime
+from datetime import datetime
 
 file_list = {
     "11185" : "../11185/11185_detail.log",
