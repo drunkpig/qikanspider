@@ -27,8 +27,8 @@ def retrieve_image(obj_id):
     return imgB64Str
 
 imgFile = "../cnki/img/0fbf6defca7f490792b83eeb9abf19ae.jpg"
-
+print("insert")
 obj_id = insert_image(imgFile)
-# print("inserted id %s" % obj_id, end="\n")
+print("inserted id %s" % obj_id, end="\n")
 string = retrieve_image(obj_id)
-# print(string)
+print(string)

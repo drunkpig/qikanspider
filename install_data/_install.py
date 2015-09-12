@@ -75,6 +75,18 @@ def merge(map1, map2):
         if val2_len>val1_len:  #  取数据量大的
             result[key] = map2.get(key)
 
+    #  特别处理yu_zhong , 去掉最后的#
+    yu_zhong = result['yu_zhong']
+    if yu_zhong is not None:
+        len = len(yu_zhong)
+        yu_zhong = yu_zhong[0:len-1]
+        result['yu_zhong'] = yu_zhong
+
+    #  _from字段要合并起来
+    from1 = map2['_from']
+    from2 = map1['_from']
+    result['_form'] = from1 + "#" + from2
+
     return result
 
 def get_cache(key):
@@ -118,7 +130,7 @@ def process_a_file(file):
                 if line is None:
                     continue
                 line = line.strip()
-                if len(line)<=0:
+                if len(line) <= 0:
                     continue
                 try:
                     line = line.strip()
@@ -146,7 +158,7 @@ for key in file_list:
     val = file_list[key]
     print("begin to process file : %s => %s" % (key, val), end="\n")
     process_a_file(val)
-    print("end process file %s", (val), end="\n");
+    print("end process file %s", (val), end="\n")
 
 # 把redis里去重之后的结果放入到文件里
 f = open("./temp", "w")
@@ -161,10 +173,10 @@ for key in all_keys:
         f.write("\n")
 
 print("保存文件成功，准备写入mongodb\n")
-#  TODO 把temp文件里的内容写入到mongodb里
+
 db = MongoClient(host="localhost", port=27017).db_qikan
 collection = db.qikan_info
-count = 0;
+count = 0
 
 with fileinput.input("./temp") as final_result_file:
     for line in final_result_file:
@@ -172,8 +184,9 @@ with fileinput.input("./temp") as final_result_file:
         string = json.loads(string, encoding="utf-8")
         #  print(string, end="\n")
         string['gmt_create'] = datetime.now()
+
         collection.insert_one(string)
-        count+=1
+        count += 1
 
 print("保存mongodb成功, 一共有%d条数据", (count), end="\n")
 
