@@ -60,7 +60,7 @@ def get_img_order(from_where):
     :return:
     """
     order = {"11185" : 1, "cqvip" : 2, "wanfang":3, "cnki":4}
-    return order[from_where]
+    return order.get(from_where)
 
 def merge(map1, map2):
     """
