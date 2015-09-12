@@ -218,7 +218,7 @@ with fileinput.input("./temp") as final_result_file:
         #  图片编码为base64
 
         imageFile = string.get('feng_mian')
-        if len(imageFile)>0 and os.path.exists(imageFile):
+        if imageFile and len(imageFile)>0 and os.path.exists(imageFile):
             b64Img = image_b64_encode(imageFile)
             string['feng_mian'] = b64Img
         else:
