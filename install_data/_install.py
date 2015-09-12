@@ -77,11 +77,11 @@ def merge(map1, map2):
             val1_len = len(str(val1))
 
         val2 = map2.get(key)
-        val2_len = 0;
+        val2_len = 0
         if val2 is not None:
             val2_len = len(str(val2))
 
-        if val2_len>val1_len:  #  取数据量大的
+        if val2_len>val1_len:  #取数据量大的
             result[key] = map2.get(key)
 
     #  特别处理yu_zhong , 去掉最后的#
@@ -217,7 +217,7 @@ with fileinput.input("./temp") as final_result_file:
         if imageFile:
             b64Img = image_b64_encode(imageFile)
             string['feng_mian'] = b64Img
-            
+
         collection.insert_one(string)
         count += 1
 
