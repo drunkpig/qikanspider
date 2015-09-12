@@ -87,8 +87,8 @@ def merge(map1, map2):
     #  特别处理yu_zhong , 去掉最后的#
     yu_zhong = result.get('yu_zhong')
     if yu_zhong is not None:
-        len = len(yu_zhong)
-        yu_zhong = yu_zhong[0:len-1]
+        len1 = len(yu_zhong)
+        yu_zhong = yu_zhong[0:len1-1]
         result['yu_zhong'] = yu_zhong
 
     #  _from字段要合并起来
