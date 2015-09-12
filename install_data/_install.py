@@ -216,7 +216,7 @@ with fileinput.input("./temp") as final_result_file:
         #  print(string, end="\n")
         string['gmt_create'] = datetime.now()
         #  图片编码为base64
-        #  TODO
+
         imageFile = string.get('feng_mian')
         if len(imageFile)>0 and os.path.exists(imageFile):
             b64Img = image_b64_encode(imageFile)

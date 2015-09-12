@@ -339,6 +339,7 @@ function img_get_file($imgUrl){
 			echo "save image: $imgFile, size=$len\n";
 		}
 		else{
+			$imgFile = "";
 			echo "image: $imgFile, size=$len, too small not save\n";
 		}
 

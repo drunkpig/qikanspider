@@ -335,7 +335,10 @@ foreach($portal as $url){
                 continue;
             }
             $img = getCover($content);
-            $result['feng_mian'] = "../cqvip/" . $img;
+            if(strlen($img)>0){
+                $result['feng_mian'] = "../cqvip/" . $img;
+            }
+
             saveUrl($result['class'] . "\t" . $url);
             file_put_contents("./cqvip_detail.log", my_json_encode($result)."\n", FILE_APPEND);
         }
