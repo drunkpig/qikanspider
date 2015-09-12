@@ -6,6 +6,7 @@ import json
 import redis
 import hashlib
 import fileinput
+import os
 from pymongo import MongoClient
 from datetime import datetime
 
@@ -36,7 +37,7 @@ def get_format_book_name(book_name):
         if i>0:
             formated_bk_name = book_name[0:i].strip()
     else:
-        formated_bk_name = "";
+        formated_bk_name = ""
     return formated_bk_name
 
 def get_key(book_zh, book_en):
@@ -217,9 +218,11 @@ with fileinput.input("./temp") as final_result_file:
         #  图片编码为base64
         #  TODO
         imageFile = string.get('feng_mian')
-        if imageFile:
+        if imageFile and os.path.exists(imageFile):
             b64Img = image_b64_encode(imageFile)
             string['feng_mian'] = b64Img
+        else:
+            print("file %s not exits\n", imageFile)
 
         collection.insert_one(string)
         count += 1
