@@ -118,7 +118,7 @@ function parse11185DetailPage($url){
         $src = "http://bk.11185.cn/" . $node->src;
         echo "$src\n";
         $imgFile = img_get_file($src);
-        $result['feng_mian'] = $imgFile;
+        $result['feng_mian'] = "../11185/" . $imgFile;
     }
     else{
         echo "没有找到图片\n";

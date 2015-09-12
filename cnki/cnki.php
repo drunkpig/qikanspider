@@ -42,7 +42,7 @@ function parseDetail($bigClass, $subClass, $info)
             $imgSrc = $fengmian->src;
             $imgSrc = substr($imgSrc, strlen("/fengmian/"));
             $src = "http://c61.cnki.net/" . $imgSrc;
-            $result['feng_mian'] = img_get_file($src);
+            $result['feng_mian'] = "../cnki/" . img_get_file($src);
         }
         $isDuJia = $dom->find("div.duJia");
         if(count($isDuJia)>0){

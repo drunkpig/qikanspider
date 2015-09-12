@@ -12,7 +12,7 @@ def insert_image(imageFile):
         # print(encoded_string, end="\n")
         obj_id = collection.insert_one({"image": encoded_string})
         #  obj_id = collection.insert_one({"image": image_file.read()})
-    return obj_id.inserted_id;
+    return obj_id.inserted_id
 
 def retrieve_image(obj_id):
     data = collection.find_one({"_id": obj_id})

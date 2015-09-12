@@ -315,7 +315,7 @@ function file_get1($filePath)
  */
 function img_get_file($imgUrl){
 
-    $imageCache = "./img/";
+    $imageCache = "img/";
     $imgFile = $imageCache . md5($imgUrl).".jpg";
     if(file_exists($imgFile)){
         $imgContent = file_get_contents($imgFile);

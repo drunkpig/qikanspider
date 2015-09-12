@@ -140,7 +140,7 @@ function parseDetail($class, $url, $content){
 	$node = $dom->find("img#periodicalImage");
 	$node = $node[0];
 	$imgUrl = $node->src;
-	$result['feng_mian'] = img_get_file($imgUrl);
+	$result['feng_mian'] = "../wanfang/" . img_get_file($imgUrl);
 
 	echo "[1]封面->";
 	//2,中文名称

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from lib.imageb64 import image_b64_encode
 
 __author__ = 'cxu'
 import json
@@ -52,6 +53,14 @@ def get_key(book_zh, book_en):
     key = zh_key + en_key
     return hashlib.md5(key.encode("utf-8")).hexdigest()
 
+def get_img_order(from_where):
+    """
+    cnki->wanfang->cqvip->11185
+    :param from_where:
+    :return:
+    """
+    order = {"11185" : 1, "cqvip" : 2, "wanfang":3, "cnki":4}
+    return order[from_where]
 
 def merge(map1, map2):
     """
@@ -76,16 +85,34 @@ def merge(map1, map2):
             result[key] = map2.get(key)
 
     #  特别处理yu_zhong , 去掉最后的#
-    yu_zhong = result['yu_zhong']
+    yu_zhong = result.get('yu_zhong')
     if yu_zhong is not None:
         len = len(yu_zhong)
         yu_zhong = yu_zhong[0:len-1]
         result['yu_zhong'] = yu_zhong
 
     #  _from字段要合并起来
-    from1 = map2['_from']
-    from2 = map1['_from']
+    from1 = map1['_from']
+    from2 = map2['_from']
     result['_form'] = from1 + "#" + from2
+
+    # 合并图片，图片优先级cnki->wanfang->cqvip->11185
+    img1 = map1.get('feng_mian')
+    img2 = map2.get('feng_mian')
+    feng_mian = img1
+    if img1 is not None and img2 is not None:
+        ord1 = get_img_order(from1)
+        ord2 = get_img_order(from2)
+        if ord2 > ord1 > 0:
+            feng_mian = img2
+    elif img1 is not None:
+        feng_mian = img1
+    elif img2 is not None:
+        feng_mian = img2
+    else:
+        feng_mian = ""
+
+    result['feng_mian'] = feng_mian
 
     return result
 
