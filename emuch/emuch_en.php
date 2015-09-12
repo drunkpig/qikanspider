@@ -112,5 +112,5 @@ for($i=1; $i<=$bookCount; $i++){
     $bookInfo = parseDetailInfo($bookUrl);
     file_put_contents($detailLog, my_json_encode($bookInfo)."\n", FILE_APPEND);
     echo "$bookUrl\n";
-    file_put_contents($detailUrl, $bookInfo['book_name_zh']."\t$bookUrl\n", FILE_APPEND);
+    file_put_contents($detailUrl, $bookInfo['book_name_en']."\t$bookUrl\n", FILE_APPEND);
 }

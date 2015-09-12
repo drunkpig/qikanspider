@@ -211,7 +211,8 @@ with fileinput.input("./temp") as final_result_file:
         string = json.loads(string, encoding="utf-8")
         #  print(string, end="\n")
         string['gmt_create'] = datetime.now()
-
+        #  图片编码为base64
+        #  TODO
         collection.insert_one(string)
         count += 1
 
