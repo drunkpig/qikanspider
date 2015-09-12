@@ -213,6 +213,11 @@ with fileinput.input("./temp") as final_result_file:
         string['gmt_create'] = datetime.now()
         #  图片编码为base64
         #  TODO
+        imageFile = string['feng_mian']
+        if imageFile:
+            b64Img = image_b64_encode(imageFile)
+            string['feng_mian'] = b64Img
+            
         collection.insert_one(string)
         count += 1
 
