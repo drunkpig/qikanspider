@@ -3,6 +3,7 @@ import base64
 __author__ = 'cxu'
 from pymongo import MongoClient
 from bson.objectid import ObjectId
+import redis
 
 db = MongoClient(host="120.26.0.133").db_qikan
 collection = db.qikan_info
